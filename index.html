@@ -43,12 +43,38 @@
             <h1>Percorso di Studio C++</h1>
             <p>Seleziona un argomento. Devi prima leggere la teoria per sbloccare il relativo Quiz!</p>
             
+            <div class="user-details-box" style="margin: 2rem 0; padding: 1.5rem; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid var(--border);">
+                <h3>Identificazione Studente</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 1rem;">Inserisci i tuoi dati. I risultati dei quiz e del live-coding verranno inviati al tutor per la valutazione.</p>
+                
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <label for="student-name" style="display:block; margin-bottom: 0.5rem; font-size:0.9rem;">Nome e Cognome *</label>
+                        <input type="text" id="student-name" class="form-input" placeholder="Es. Mario Rossi" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-dark); color: white;">
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <label for="student-contact" style="display:block; margin-bottom: 0.5rem; font-size:0.9rem;">Contatto Discord o Email *</label>
+                        <input type="text" id="student-contact" class="form-input" placeholder="Es. mario.rossi@email.it" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-dark); color: white;">
+                    </div>
+                </div>
+
+                <div style="margin-top: 1rem;">
+                    <label for="quiz-time" style="display:block; margin-bottom: 0.5rem; font-size:0.9rem;">Tempo a disposizione (influenza il n. di domande)</label>
+                    <select id="quiz-time" class="form-input" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-dark); color: white;">
+                        <option value="5">5 Minuti (Breve, 5 domande)</option>
+                        <option value="10">10 Minuti (Standard, 10 domande)</option>
+                        <option value="15">15 Minuti (Completo, 15 domande)</option>
+                    </select>
+                </div>
+            </div>
+            
             <div id="modules-container" class="modules-grid">
                 <!-- I moduli verranno generati da JS -->
             </div>
 
-            <div style="margin-top: 3rem; text-align: center;">
-                <button id="open-simulazione-btn" class="btn-primary" style="background: var(--secondary); font-size: 1.2rem; padding: 15px 30px; box-shadow: 0 0 15px var(--secondary);">📝 Simulazione Verifica ed Esercizi</button>
+            <div style="margin-top: 3rem; text-align: center; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <button id="open-simulazione-btn" class="btn-primary" style="background: var(--secondary); font-size: 1rem; padding: 15px 30px; box-shadow: 0 0 15px rgba(255, 62, 165, 0.3);">📘 Esempi Esercizi (Correzioni)</button>
+                <button id="open-live-coding-btn" class="btn-primary" style="background: var(--primary); font-size: 1rem; padding: 15px 30px; box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);">💻 Inizia Live Coding</button>
             </div>
         </section>
 
@@ -157,10 +183,42 @@ int main() {
             </div>
         </section>
 
+        <!-- Sezione Live Coding (Nuova) -->
+        <section id="coding-screen" class="screen">
+            <button id="back-to-dash-btn-coding" class="btn-icon mb-4">← Torna alla Dashboard</button>
+            <div class="lesson-header">
+                <span class="badge" style="background:var(--primary)">Live Coding</span>
+                <span id="coding-timer" class="stat-value" style="margin-left:auto; font-family: 'Fira Code', monospace; color: var(--primary);"></span>
+            </div>
+            <h2>Esame Pratico C++</h2>
+            
+            <div class="lesson-content-box" style="display: flex; flex-direction: column; height: 60vh;">
+                <div id="coding-prompt-container" style="margin-bottom: 1rem; padding: 1rem; background: rgba(0,240,255,0.05); border-left: 4px solid var(--primary);">
+                    <h3 style="margin-top:0; font-size: 1.1rem;">Traccia:</h3>
+                    <p id="coding-prompt-text" style="font-size: 0.95rem; line-height: 1.5;"></p>
+                </div>
+                
+                <textarea id="code-editor" class="code-container" style="flex: 1; width: 100%; font-family: 'Fira Code', monospace; font-size: 1rem; padding: 15px; border: 1px solid var(--border); border-radius: 8px; background: #1a1a2e; color: #a5b4fc; resize: none;" spellcheck="false" placeholder="// Scrivi qui il tuo codice C++...
+#include <iostream>
+using namespace std;
+
+int main() {
+    
+    return 0;
+}"></textarea>
+                
+                <div style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                    <span id="coding-status-msg" style="font-size: 0.9rem; color: var(--text-muted);"></span>
+                    <button id="submit-code-btn" class="btn-primary" style="background: var(--success); color: black;">Invia al Tutor ➔</button>
+                </div>
+            </div>
+        </section>
+
         <!-- Sezione Quiz -->
         <section id="quiz-screen" class="screen">
-            <div class="question-header">
+            <div class="question-header" style="display:flex; justify-content:space-between; align-items:center;">
                 <span id="topic-badge" class="badge">Argomento</span>
+                <span id="quiz-timer-display" class="badge" style="background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted);">00:00</span>
             </div>
             <h2 id="question-text">Testo della domanda...</h2>
             

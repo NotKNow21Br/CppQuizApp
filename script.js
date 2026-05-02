@@ -37,16 +37,24 @@ const nextBtn = document.getElementById('next-btn');
 const restartBtn = document.getElementById('restart-btn');
 const resetBtn = document.getElementById('reset-btn');
 
+// Aggiunta webhook discord
+const WEBHOOK_URL = "https://discord.com/api/webhooks/943692481290182667/3FV4yvjwdpZjkcbtfQIBTghAbRVBFteDCcdjqNQDRbWJHt9HV_zaSAhBGFGp0_dH1Ms3";
+
 // Variabili di stato
 let currentSessionQuestions = [];
 let currentQuestionIndex = 0;
 let sessionScore = 0;
 let currentModule = "";
 let userStats = {
+    name: "",
+    contact: "",
     totalScore: 0,
     gamesPlayed: 0,
-    unlockedModules: []
+    unlockedModules: [],
+    domandeSuperate: []
 };
+let sessionTimer = null;
+let timeRemaining = 0;
 
 const QUESTIONS_PER_SESSION = 5;
 
@@ -67,15 +75,28 @@ function init() {
         if(window.demoInterval) clearInterval(window.demoInterval);
         showDashboard();
     });
+    
+    // Live coding
+    document.getElementById('open-live-coding-btn').addEventListener('click', openLiveCoding);
+    document.getElementById('back-to-dash-btn-coding').addEventListener('click', () => {
+        if(sessionTimer) clearInterval(sessionTimer);
+        showDashboard();
+    });
+    document.getElementById('submit-code-btn').addEventListener('click', submitLiveCoding);
 }
 
 function loadStats() {
     try {
         const saved = localStorage.getItem('cppQuizStats');
         if (saved) {
-            userStats = JSON.parse(saved);
-            if (!userStats.unlockedModules) userStats.unlockedModules = [];
+            userStats = Object.assign({ name: "", contact: "", totalScore: 0, gamesPlayed: 0, unlockedModules: [], domandeSuperate: [] }, JSON.parse(saved));
             scoreDisplay.textContent = userStats.totalScore;
+            
+            // Popola input
+            const nameInput = document.getElementById('student-name');
+            const contactInput = document.getElementById('student-contact');
+            if(nameInput && userStats.name) nameInput.value = userStats.name;
+            if(contactInput && userStats.contact) contactInput.value = userStats.contact;
         }
     } catch (e) {
         console.warn("LocalStorage bloccato dal browser su file local.", e);
@@ -91,7 +112,7 @@ function saveStats() {
 
 function resetStats() {
     if(confirm("Sei sicuro di voler azzerare tutti i tuoi progressi (inclusi i moduli sbloccati)?")) {
-        userStats = { totalScore: 0, gamesPlayed: 0, unlockedModules: [] };
+        userStats = { name: "", contact: "", totalScore: 0, gamesPlayed: 0, unlockedModules: [], domandeSuperate: [] };
         saveStats();
         renderDashboard();
     }
@@ -102,6 +123,7 @@ function showDashboard() {
     quizScreen.classList.remove('active');
     resultScreen.classList.remove('active');
     simulazioneScreen.classList.remove('active');
+    document.getElementById('coding-screen').classList.remove('active');
     startScreen.classList.add('active');
     renderDashboard();
 }
@@ -647,15 +669,36 @@ function shuffleArray(array) {
 
 // Gestione Quiz
 function startSession(moduleName) {
+    const nameInput = document.getElementById('student-name').value.trim();
+    const contactInput = document.getElementById('student-contact').value.trim();
+    if(!nameInput || !contactInput) {
+        alert("Inserisci Nome e Contatto prima di iniziare!");
+        return;
+    }
+    
+    // Salva info studente
+    userStats.name = nameInput;
+    userStats.contact = contactInput;
+    saveStats();
+
+    const timeSelect = document.getElementById('quiz-time').value;
+    const questionsCount = timeSelect == 5 ? 5 : (timeSelect == 10 ? 10 : 15);
+    const timeInSeconds = timeSelect * 60;
+
     sessionScore = 0;
     currentQuestionIndex = 0;
     
-    // Filtra domande solo per questo modulo
-    const moduleQuestions = quizQuestions.filter(q => q.category === moduleName);
+    // Filtra domande solo per questo modulo e NON già superate
+    let moduleQuestions = quizQuestions.filter(q => q.category === moduleName && !userStats.domandeSuperate.includes(q.id));
     
-    // Se non ci sono abbastanza domande per il modulo, usa quelle che ci sono
+    if(moduleQuestions.length < questionsCount) {
+        // Se non ce ne sono abbastanza nuove, peschiamo anche tra quelle vecchie per riempire
+        const oldQuestions = quizQuestions.filter(q => q.category === moduleName && userStats.domandeSuperate.includes(q.id));
+        moduleQuestions = moduleQuestions.concat(shuffleArray(oldQuestions));
+    }
+    
     const shuffled = shuffleArray(moduleQuestions);
-    currentSessionQuestions = shuffled.slice(0, Math.min(QUESTIONS_PER_SESSION, shuffled.length));
+    currentSessionQuestions = shuffled.slice(0, questionsCount);
     
     if(currentSessionQuestions.length === 0) {
         alert("Attenzione: Non ci sono ancora domande per questo modulo!");
@@ -666,7 +709,34 @@ function startSession(moduleName) {
     resultScreen.classList.remove('active');
     quizScreen.classList.add('active');
     
+    startTimer(timeInSeconds, 'quiz-timer-display', endSession);
     renderQuestion();
+}
+
+function startTimer(seconds, displayId, onTimeout) {
+    if(sessionTimer) clearInterval(sessionTimer);
+    timeRemaining = seconds;
+    const display = document.getElementById(displayId);
+    
+    const updateDisplay = () => {
+        const m = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
+        const s = (timeRemaining % 60).toString().padStart(2, '0');
+        if(display) display.textContent = `${m}:${s}`;
+        
+        if(timeRemaining <= 60 && display) display.style.color = 'var(--danger)';
+        else if (display) display.style.color = '';
+    };
+    
+    updateDisplay();
+    sessionTimer = setInterval(() => {
+        timeRemaining--;
+        updateDisplay();
+        if(timeRemaining <= 0) {
+            clearInterval(sessionTimer);
+            alert("Tempo scaduto!");
+            onTimeout();
+        }
+    }, 1000);
 }
 
 function renderQuestion() {
@@ -730,6 +800,10 @@ function handleAnswer(selectedIndex, btnElement) {
         btnElement.classList.add('wrong');
     } else {
         sessionScore += 10; // 10 punti a risposta esatta
+        if(!userStats.domandeSuperate.includes(q.id)) {
+            userStats.domandeSuperate.push(q.id);
+            saveStats();
+        }
     }
     
     showFeedback(isCorrect, q);
@@ -824,6 +898,8 @@ function updateProgressBar() {
 }
 
 function endSession() {
+    if(sessionTimer) clearInterval(sessionTimer);
+    
     quizScreen.classList.remove('active');
     resultScreen.classList.add('active');
     
@@ -839,6 +915,119 @@ function endSession() {
     } else {
         summary.innerHTML = "<h3>Continua ad esercitarti 📚</h3><p>Rileggi la teoria se hai ancora dei dubbi.</p>";
     }
+    
+    inviaRisultatiDiscord();
+}
+
+function inviaRisultatiDiscord() {
+    if(!userStats.name) return;
+    
+    const timeSelect = document.getElementById('quiz-time').value;
+    const timeSpent = timeSelect * 60 - timeRemaining;
+    const m = Math.floor(timeSpent / 60);
+    const s = timeSpent % 60;
+    
+    const payload = {
+        embeds: [{
+            title: "📝 Nuovo Quiz Completato",
+            color: 0x00F0FF,
+            fields: [
+                { name: "Studente", value: userStats.name, inline: true },
+                { name: "Contatto", value: userStats.contact, inline: true },
+                { name: "Argomento", value: currentModule || "Quiz", inline: false },
+                { name: "Punteggio", value: `${sessionScore} / ${currentSessionQuestions.length * 10}`, inline: true },
+                { name: "Tempo Impiegato", value: `${m}m ${s}s`, inline: true }
+            ],
+            timestamp: new Date().toISOString()
+        }]
+    };
+
+    fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    }).catch(e => console.error("Errore invio webhook:", e));
+}
+
+function openLiveCoding() {
+    const nameInput = document.getElementById('student-name').value.trim();
+    const contactInput = document.getElementById('student-contact').value.trim();
+    if(!nameInput || !contactInput) {
+        alert("Inserisci Nome e Contatto prima di iniziare il Live Coding!");
+        return;
+    }
+    
+    userStats.name = nameInput;
+    userStats.contact = contactInput;
+    saveStats();
+    
+    startScreen.classList.remove('active');
+    document.getElementById('coding-screen').classList.add('active');
+    
+    const tracce = [
+        "Scrivi un programma in C++ che dichiari una matrice 4x4 di interi, la riempia con numeri casuali da 1 a 10 e calcoli la somma degli elementi sulla diagonale principale.",
+        "Scrivi un programma in C++ che chieda all'utente 5 stringhe, le inserisca in un array e poi stampi la parola più corta.",
+        "Implementa una struttura 'Studente' e scrivi il codice necessario per salvare un array di 3 studenti all'interno di un file binario chiamato 'classe.dat'."
+    ];
+    const traccia = tracce[Math.floor(Math.random() * tracce.length)];
+    document.getElementById('coding-prompt-text').textContent = traccia;
+    
+    document.getElementById('code-editor').value = "";
+    document.getElementById('coding-status-msg').textContent = "";
+    document.getElementById('submit-code-btn').disabled = false;
+    
+    startTimer(20 * 60, 'coding-timer', submitLiveCoding);
+}
+
+function submitLiveCoding() {
+    const code = document.getElementById('code-editor').value.trim();
+    if(!code && timeRemaining > 0) {
+        alert("Scrivi almeno una riga di codice prima di consegnare!");
+        return;
+    }
+    
+    if(sessionTimer) clearInterval(sessionTimer);
+    
+    const traccia = document.getElementById('coding-prompt-text').textContent;
+    const btn = document.getElementById('submit-code-btn');
+    const msg = document.getElementById('coding-status-msg');
+    
+    btn.disabled = true;
+    msg.textContent = "Invio in corso...";
+    msg.style.color = "var(--primary)";
+    
+    const payload = {
+        embeds: [{
+            title: "💻 Consegna Live Coding",
+            color: 0xFF3EA5,
+            fields: [
+                { name: "Studente", value: userStats.name, inline: true },
+                { name: "Contatto", value: userStats.contact, inline: true },
+                { name: "Traccia", value: traccia, inline: false }
+            ],
+            description: "```cpp\n" + (code || "// Nessun codice inserito") + "\n```",
+            timestamp: new Date().toISOString()
+        }]
+    };
+
+    fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    }).then(res => {
+        if(res.ok) {
+            msg.textContent = "✓ Inviato con successo al Tutor!";
+            msg.style.color = "var(--success)";
+        } else {
+            msg.textContent = "✗ Errore durante l'invio.";
+            msg.style.color = "var(--danger)";
+            btn.disabled = false;
+        }
+    }).catch(e => {
+        msg.textContent = "✗ Errore di rete.";
+        msg.style.color = "var(--danger)";
+        btn.disabled = false;
+    });
 }
 
 // Avvio applicazione
