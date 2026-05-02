@@ -46,6 +46,10 @@
             <div id="modules-container" class="modules-grid">
                 <!-- I moduli verranno generati da JS -->
             </div>
+
+            <div style="margin-top: 3rem; text-align: center;">
+                <button id="open-simulazione-btn" class="btn-primary" style="background: var(--secondary); font-size: 1.2rem; padding: 15px 30px; box-shadow: 0 0 15px var(--secondary);">📝 Simulazione Verifica ed Esercizi</button>
+            </div>
         </section>
 
         <!-- Sezione Lezione Teoria -->
@@ -62,6 +66,94 @@
             
             <div class="lesson-footer">
                 <button id="finish-lesson-btn" class="btn-primary w-full">Ho Letto e Capito ✓</button>
+            </div>
+        </section>
+
+        <!-- Sezione Simulazione Verifica -->
+        <section id="simulazione-screen" class="screen">
+            <button id="back-to-dash-btn-sim" class="btn-icon mb-4">← Torna alla Dashboard</button>
+            <div class="lesson-header">
+                <span class="badge" style="background:var(--secondary)">Simulazione Verifica</span>
+            </div>
+            <h2>Correzione Esercizi C++</h2>
+            
+            <div class="lesson-content-box">
+                <h3>Es 1: Riga con somma più alta in una matrice</h3>
+                <p>Spiegazione: Iteriamo per ogni riga e calcoliamo la somma, salvandola se è la massima.</p>
+                <div class="code-container">
+                    <pre><code class="language-cpp">
+#include &lt;iostream&gt;
+using namespace std;
+
+// Funzione che riceve la matrice e trova la riga con somma maggiore
+void stampaRigaSommaMassima(int mat[4][4]) {
+    int sommaMax = -2147483648; // Inizializziamo con il valore minimo possibile
+    int indiceRigaMax = 0;
+
+    for (int i = 0; i < 4; i++) { // Ciclo per ogni riga
+        int sommaCorrente = 0;
+        for (int j = 0; j < 4; j++) { // Ciclo per ogni colonna
+            sommaCorrente += mat[i][j]; // Sommo gli elementi della riga i
+        }
+
+        // Se la somma della riga attuale è maggiore della massima trovata finora
+        if (sommaCorrente > sommaMax) {
+            sommaMax = sommaCorrente;
+            indiceRigaMax = i;
+        }
+    }
+
+    // Stampiamo la riga trovata
+    cout << "La riga con la somma piu' alta e' la numero: " << indiceRigaMax << " (somma: " << sommaMax << ")" << endl;
+    cout << "Elementi della riga: ";
+    for (int j = 0; j < 4; j++) {
+        cout << mat[indiceRigaMax][j] << " ";
+    }
+    cout << endl;
+}
+                    </code></pre>
+                </div>
+                <div id="sim-matrix-demo" class="visual-explanation" style="display:block; margin-top:1rem;"></div>
+
+                <hr style="border-color:var(--text-muted); opacity: 0.2; margin: 2rem 0;">
+
+                <h3>Es 2: Parola più lunga in un array di stringhe</h3>
+                <p>Spiegazione: Scorriamo l'array controllando la lunghezza <code>.length()</code> di ogni stringa per trovare il massimo.</p>
+                <div class="code-container">
+                    <pre><code class="language-cpp">
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+// Funzione che ritorna la posizione della stringa più lunga nell'array
+int posizioneParolaPiuLunga(string array[], int dimensione) {
+    int maxLunghezza = 0;
+    int posizione = 0;
+
+    for (int i = 0; i < dimensione; i++) {
+        // .length() restituisce il numero di caratteri della stringa
+        if (array[i].length() > maxLunghezza) {
+            maxLunghezza = array[i].length();
+            posizione = i; // Salviamo l'indice (posizione)
+        }
+    }
+
+    return posizione; 
+}
+
+// Esempio d'uso nel main
+int main() {
+    string parole[] = {"mela", "pomodoro", "casa", "informatica"};
+    int pos = posizioneParolaPiuLunga(parole, 4);
+    
+    cout << "La parola piu' lunga si trova in posizione: " << pos << endl;
+    cout << "La parola e': " << parole[pos] << endl;
+    
+    return 0;
+}
+                    </code></pre>
+                </div>
+                <div id="sim-vector-demo" class="visual-explanation" style="display:block; margin-top:1rem;"></div>
             </div>
         </section>
 

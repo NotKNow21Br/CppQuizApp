@@ -3,6 +3,7 @@ const startScreen = document.getElementById('start-screen');
 const quizScreen = document.getElementById('quiz-screen');
 const resultScreen = document.getElementById('result-screen');
 const lessonScreen = document.getElementById('lesson-screen');
+const simulazioneScreen = document.getElementById('simulazione-screen');
 
 const scoreDisplay = document.getElementById('score-display');
 const questionCountDisplay = document.getElementById('question-count');
@@ -15,6 +16,10 @@ const lessonTitle = document.getElementById('lesson-title');
 const lessonContent = document.getElementById('lesson-content');
 const backToDashBtn = document.getElementById('back-to-dash-btn');
 const finishLessonBtn = document.getElementById('finish-lesson-btn');
+
+// Simulazione Elementi
+const openSimulazioneBtn = document.getElementById('open-simulazione-btn');
+const backToDashBtnSim = document.getElementById('back-to-dash-btn-sim');
 
 // Quiz Elementi
 const questionText = document.getElementById('question-text');
@@ -55,6 +60,13 @@ function init() {
     nextBtn.addEventListener('click', loadNextQuestion);
     restartBtn.addEventListener('click', showDashboard);
     resetBtn.addEventListener('click', resetStats);
+    
+    // Nuovi listeners
+    openSimulazioneBtn.addEventListener('click', openSimulazione);
+    backToDashBtnSim.addEventListener('click', () => {
+        if(window.demoInterval) clearInterval(window.demoInterval);
+        showDashboard();
+    });
 }
 
 function loadStats() {
@@ -89,8 +101,16 @@ function showDashboard() {
     lessonScreen.classList.remove('active');
     quizScreen.classList.remove('active');
     resultScreen.classList.remove('active');
+    simulazioneScreen.classList.remove('active');
     startScreen.classList.add('active');
     renderDashboard();
+}
+
+function openSimulazione() {
+    startScreen.classList.remove('active');
+    simulazioneScreen.classList.add('active');
+    initSimMatrixDemo();
+    initSimVectorDemo();
 }
 
 // Render Dashboard
@@ -154,7 +174,231 @@ function completeLesson() {
     showDashboard();
 }
 
-// --- DEMO INTERATTIVE TEORIA ---
+// --- SIMULAZIONI VERIFICA ---
+function initSimMatrixDemo() {
+    const container = document.getElementById('sim-matrix-demo');
+    container.innerHTML = '<div class="demo-title">Animazione: Ricerca Riga con Somma Massima</div>';
+    
+    const flexBox = document.createElement('div');
+    flexBox.style.display = 'flex';
+    flexBox.style.gap = '2rem';
+    
+    const grid = document.createElement('div');
+    grid.className = 'interactive-grid';
+    grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
+    
+    const values = [
+        [1, 2, 3, 4],    // sum = 10
+        [5, 1, 0, 2],    // sum = 8
+        [9, 9, 2, 1],    // sum = 21 (MAX)
+        [0, 5, 5, 5]     // sum = 15
+    ];
+    
+    const cells = [];
+    for(let i=0; i<4; i++) {
+        const row = [];
+        for(let j=0; j<4; j++) {
+            const cell = document.createElement('div');
+            cell.className = 'grid-cell';
+            cell.textContent = values[i][j];
+            grid.appendChild(cell);
+            row.push(cell);
+        }
+        cells.push(row);
+    }
+    
+    const infoPanel = document.createElement('div');
+    infoPanel.style.minWidth = '200px';
+    infoPanel.innerHTML = `
+        <div style="margin-bottom:10px"><strong>Stato Variabili:</strong></div>
+        <div id="sim-mat-maxSum" class="code-line">maxSum = -2147483648</div>
+        <div id="sim-mat-maxRow" class="code-line">maxRowIndex = 0</div>
+        <div id="sim-mat-currSum" class="code-line" style="margin-top:20px; color:var(--secondary)">currentSum = 0</div>
+    `;
+    
+    flexBox.appendChild(grid);
+    flexBox.appendChild(infoPanel);
+    container.appendChild(flexBox);
+    
+    const btnPlay = document.createElement('button');
+    btnPlay.className = 'btn-secondary mt-4';
+    btnPlay.textContent = '▶ Esegui Algoritmo';
+    container.appendChild(btnPlay);
+    
+    let isPlaying = false;
+    
+    btnPlay.onclick = () => {
+        if(isPlaying) return;
+        isPlaying = true;
+        btnPlay.disabled = true;
+        
+        let maxSum = -2147483648;
+        let maxRowIndex = 0;
+        let i = 0;
+        let j = 0;
+        let currentSum = 0;
+        
+        const updateUI = () => {
+            document.getElementById('sim-mat-maxSum').textContent = `maxSum = ${maxSum}`;
+            document.getElementById('sim-mat-maxRow').textContent = `maxRowIndex = ${maxRowIndex}`;
+            document.getElementById('sim-mat-currSum').textContent = `currentSum = ${currentSum}`;
+        };
+        
+        updateUI();
+        cells.forEach(r => r.forEach(c => c.style.background = ''));
+        
+        if(window.demoInterval) clearInterval(window.demoInterval);
+        
+        window.demoInterval = setInterval(() => {
+            if(j === 0 && currentSum === 0) {
+                // Inizio riga
+                cells.forEach(r => r.forEach(c => c.classList.remove('highlight-i')));
+                for(let col=0; col<4; col++) cells[i][col].classList.add('highlight-i');
+            }
+            
+            // Highlight current cell
+            cells[i].forEach(c => c.classList.remove('highlight-j'));
+            cells[i][j].classList.add('highlight-j');
+            
+            currentSum += values[i][j];
+            updateUI();
+            
+            j++;
+            if(j >= 4) {
+                // Fine riga
+                setTimeout(() => {
+                    cells[i][3].classList.remove('highlight-j');
+                    if(currentSum > maxSum) {
+                        maxSum = currentSum;
+                        maxRowIndex = i;
+                        updateUI();
+                        // Lampeggio per indicare nuovo record
+                        document.getElementById('sim-mat-maxSum').style.color = 'var(--success)';
+                        setTimeout(() => document.getElementById('sim-mat-maxSum').style.color = '', 500);
+                    }
+                    currentSum = 0;
+                    i++;
+                    j = 0;
+                    if(i >= 4) {
+                        clearInterval(window.demoInterval);
+                        setTimeout(() => {
+                            cells.forEach(r => r.forEach(c => c.className = 'grid-cell'));
+                            for(let col=0; col<4; col++) {
+                                cells[maxRowIndex][col].style.background = 'var(--success)';
+                                cells[maxRowIndex][col].style.color = '#000';
+                            }
+                            isPlaying = false;
+                            btnPlay.disabled = false;
+                        }, 1000);
+                    }
+                }, 800); // Pausa a fine riga prima di passare alla successiva
+            }
+        }, 800);
+    };
+}
+
+function initSimVectorDemo() {
+    const container = document.getElementById('sim-vector-demo');
+    container.innerHTML = '<div class="demo-title">Animazione: Ricerca Parola Più Lunga</div>';
+    
+    const flexBox = document.createElement('div');
+    flexBox.style.display = 'flex';
+    flexBox.style.flexDirection = 'column';
+    flexBox.style.gap = '1rem';
+    
+    const words = ["Gatto", "Elefante", "Cane", "Ippopotamo", "Rana"];
+    const grid = document.createElement('div');
+    grid.className = 'interactive-grid';
+    grid.style.gridTemplateColumns = 'repeat(5, 1fr)';
+    
+    const cells = [];
+    words.forEach((w, index) => {
+        const cell = document.createElement('div');
+        cell.className = 'grid-cell';
+        cell.style.width = 'auto';
+        cell.style.padding = '10px';
+        cell.innerHTML = `[${index}]<br><strong>${w}</strong><br><small>len: ${w.length}</small>`;
+        grid.appendChild(cell);
+        cells.push(cell);
+    });
+    
+    const infoPanel = document.createElement('div');
+    infoPanel.style.display = 'flex';
+    infoPanel.style.gap = '2rem';
+    infoPanel.innerHTML = `
+        <div id="sim-vec-maxLen" class="code-line">maxLength = ${words[0].length}</div>
+        <div id="sim-vec-maxIdx" class="code-line">maxIndex = 0</div>
+    `;
+    
+    flexBox.appendChild(grid);
+    flexBox.appendChild(infoPanel);
+    container.appendChild(flexBox);
+    
+    const btnPlay = document.createElement('button');
+    btnPlay.className = 'btn-secondary mt-4';
+    btnPlay.textContent = '▶ Esegui Algoritmo';
+    container.appendChild(btnPlay);
+    
+    let isPlaying = false;
+    
+    btnPlay.onclick = () => {
+        if(isPlaying) return;
+        isPlaying = true;
+        btnPlay.disabled = true;
+        
+        let maxLength = words[0].length;
+        let maxIndex = 0;
+        let i = 1;
+        
+        const updateUI = () => {
+            document.getElementById('sim-vec-maxLen').textContent = `maxLength = ${maxLength}`;
+            document.getElementById('sim-vec-maxIdx').textContent = `maxIndex = ${maxIndex}`;
+        };
+        
+        updateUI();
+        cells.forEach(c => {
+            c.style.background = '';
+            c.style.color = '';
+            c.style.border = '1px solid transparent';
+            c.classList.remove('highlight-j');
+        });
+        
+        // Highlight iniziale di maxIndex
+        cells[0].style.border = '2px solid var(--secondary)';
+        
+        if(window.demoInterval) clearInterval(window.demoInterval);
+        
+        window.demoInterval = setInterval(() => {
+            cells.forEach((c, idx) => {
+                if(idx !== maxIndex) c.style.border = '1px solid transparent';
+                c.classList.remove('highlight-j');
+            });
+            
+            cells[i].classList.add('highlight-j');
+            
+            if(words[i].length > maxLength) {
+                cells[maxIndex].style.border = '1px solid transparent';
+                maxLength = words[i].length;
+                maxIndex = i;
+                cells[maxIndex].style.border = '2px solid var(--secondary)';
+                updateUI();
+            }
+            
+            i++;
+            if(i >= words.length) {
+                clearInterval(window.demoInterval);
+                setTimeout(() => {
+                    cells.forEach(c => c.classList.remove('highlight-j'));
+                    cells[maxIndex].style.background = 'var(--secondary)';
+                    cells[maxIndex].style.color = '#fff';
+                    isPlaying = false;
+                    btnPlay.disabled = false;
+                }, 1000);
+            }
+        }, 1200);
+    };
+}
+
 function initMatrixDemo() {
     const container = document.getElementById('interactive-matrix-demo');
     container.innerHTML = '<div class="demo-title">Esecuzione: for(int i=0...) { for(int j=0...) { ... } }</div>';

@@ -1,161 +1,184 @@
 const lessonsData = {
     "File I/O": {
-        title: "Operazioni su File e Buffer in C++",
+        title: "File di Testo e File Binari in C++",
         content: `
-            <h3>1. L'Astrazione degli Stream e il Buffer</h3>
-            <p>In C++, l'Input/Output (I/O) non avviene direttamente con l'hardware, ma tramite un'astrazione chiamata <strong>Stream</strong> (Flusso). Un flusso è semplicemente una sequenza di byte.</p>
-            <p>La libreria standard C++ gestisce gli stream in memoria usando un <strong>Buffer</strong>. Il buffer è una zona temporanea della memoria RAM usata per accumulare i byte prima di trasferirli fisicamente sul disco. Perché? Perché il disco fisso è ordini di grandezza più lento della RAM!</p>
-            <div id="interactive-buffer-demo" class="demo-container"></div>
+            <h3>1. La gestione di file in C++</h3>
+            <p>I file consentono di conservare permanentemente, su memoria di massa, i nostri dati. Imparare ad usare i file è INDISPENSABILE per poter programmare. Per lavorare con i file su disco è necessario includere l'header <code>&lt;fstream&gt;</code>.</p>
+            <p>I file in C++ possono essere di <strong>testo</strong> o <strong>binari</strong>. I file di testo contengono caratteri in formato ASCII (visibili). I file binari memorizzano i dati nello stesso formato in cui sono rappresentati in memoria RAM, garantendo alte prestazioni ma minore portabilità.</p>
+
+            <h3>2. Assegnazione, Dichiarazione e Apertura</h3>
+            <p>Il Sistema Operativo gestisce fisicamente il disco. A noi basta usare il "nome logico" dello stream per comunicare con il file.</p>
             <ul>
-                <li>Quando chiami <code>file << "Ciao";</code>, la parola "Ciao" va nel buffer in RAM.</li>
-                <li>Il disco rigido si attiverà per salvare i dati solo quando il buffer è pieno, oppure quando chiami esplicitamente <code>file.flush()</code>, o quando chiudi il file (<code>file.close()</code>).</li>
+                <li><code>fstream</code> per I/O combinato.</li>
+                <li><code>ofstream</code> per solo Output (scrittura).</li>
+                <li><code>ifstream</code> per solo Input (lettura).</li>
+            </ul>
+            <p>Modalità principali (si combinano con <code>|</code>, es: <code>ios::out | ios::app</code>):</p>
+            <ul>
+                <li><code>ios::out</code> (crea o tronca in scrittura).</li>
+                <li><code>ios::app</code> (append, aggiunge alla fine senza cancellare).</li>
+                <li><code>ios::in</code> (lettura).</li>
+                <li><code>ios::binary</code> (apre il file in formato binario invece che testo).</li>
+            </ul>
+            
+            <div id="interactive-buffer-demo" class="demo-container"></div>
+
+            <h3>3. File di Testo</h3>
+            <p>Si usano come <code>cin</code> e <code>cout</code>. Spazi e a capo fanno da separatori.</p>
+            <ul>
+                <li><code>f.get(char)</code> legge un singolo carattere.</li>
+                <li><code>f >> stringa</code> legge fino al primo spazio.</li>
+                <li><code>getline(f, stringa)</code> legge l'intera riga.</li>
+                <li><code>f.put(char)</code> scrive un singolo carattere.</li>
+                <li><code>f << stringa << endl;</code> scrive una stringa seguita da "a capo".</li>
             </ul>
 
-            <h3>2. Fstream: Apertura e Chiusura</h3>
-            <p>Per interagire coi file, includiamo <code>&lt;fstream&gt;</code> che ci fornisce le classi <code>ifstream</code> (per leggere) e <code>ofstream</code> (per scrivere).</p>
+            <h3>4. File Binari e Record (Struct)</h3>
+            <p>I file binari non contengono caratteri ma byte grezzi. Spesso si organizzano in <strong>record</strong> tramite le <code>struct</code>. È obbligatorio usare array di caratteri (<code>char[]</code>) invece di <code>string</code> per mantenere una dimensione in byte FISSA.</p>
+            <pre><code class="language-cpp">
+typedef struct contatto {
+    char nome[30];
+    char tel[15];
+};
+contatto buffer; // Variabile di appoggio in RAM
+            </code></pre>
+            
+            <h4>Lettura e Scrittura Binaria</h4>
+            <p>Avvengono un <strong>intero record alla volta</strong> usando le dimensioni esatte (<code>sizeof</code>) della struct e i puntatori (<code>char*</code>).</p>
+            <ul>
+                <li><code>f.read((char*)&buffer, sizeof(buffer));</code></li>
+                <li><code>f.write((char*)&buffer, sizeof(buffer));</code></li>
+            </ul>
+            <p>Queste operazioni sono rapidissime perché copiano i byte dalla RAM al Disco 1:1.</p>
+
+            <h3>5. Accesso Diretto (seekg, seekp, tellg)</h3>
+            <p>I file binari permettono l'accesso diretto (saltare a un punto specifico):</p>
+            <ul>
+                <li><code>tellg()</code> e <code>tellp()</code> restituiscono la posizione (byte) corrente nel file.</li>
+                <li><code>seekg(offset, origine)</code> sposta il cursore di lettura. (Origine: <code>ios::beg</code>, <code>ios::cur</code>, <code>ios::end</code>).</li>
+                <li><code>seekp(offset, origine)</code> sposta il cursore di scrittura.</li>
+            </ul>
+            <p><strong>Esempio Modifica:</strong> Per modificare un record appena letto, devo tornare indietro di un record intero prima di sovrascrivere:</p>
+            <pre><code class="language-cpp">
+long int pos = f.tellg(); // Dove sono ora?
+pos = pos - sizeof(buffer); // Torno indietro di una struct
+f.seekp(pos, ios::beg); // Riposiziono il cursore di scrittura
+f.write((char*)&buffer, sizeof(buffer)); // Sovrascrivo
+            </code></pre>
+
+            <h3>6. Cancellazione Fisica (File di Appoggio)</h3>
+            <p>In C++ non esiste un comando magico per "cancellare una riga dal centro". La tecnica standard è:</p>
+            <ol>
+                <li>Aprire in lettura il file originale.</li>
+                <li>Aprire in scrittura un file temporaneo (<code>appo.dat</code>).</li>
+                <li>Copiare dal vecchio al nuovo TUTTI i record <strong>TRANNE</strong> quello da cancellare.</li>
+                <li>Svuotare il vecchio file e ricopiarvi tutto il file temporaneo.</li>
+            </ol>
+        `
+    },
+    "Matrici": {
+        title: "Matrici (Array bidimensionali) in C++",
+        content: `
+            <h3>1. Cos'è una matrice in C++</h3>
+            <p>Le matrici non sono altro che array bidimensionali. Se un array è una cassettiera, una matrice è un insieme di cassettiere una a fianco all'altra. Ogni cella è individuata da una COPPIA di coordinate (riga e colonna), proprio come a Battaglia Navale.</p>
+            
+            <pre><code class="language-cpp">
+// Dichiaro una matrice m di int con 4 righe e 5 colonne
+int m[4][5];
+            </code></pre>
+            <p>Gli indici partono da 0. Le righe andranno da 0 a 3, le colonne da 0 a 4. Attenzione a non superare questi limiti (in C++ non avrai errori espliciti, ma andrai a sfasciare altre aree di memoria!).</p>
+            
+            <div id="interactive-matrix-demo" class="demo-container"></div>
+
+            <h3>2. Lavorare con tutte le celle (Cicli Annidati)</h3>
+            <p>La tecnica standard per scorrere una matrice è usare due cicli <code>for</code> annidati.</p>
+            <pre><code class="language-cpp">
+// Stampa l'intera matrice
+for(int i = 0; i < numeroDiRighe; i++) {
+    for(int j = 0; j < numeroDiColonne; j++) {
+        cout << m[i][j] << " ";
+    }
+    cout << endl; // A capo dopo ogni riga
+}
+            </code></pre>
+
+            <h3>3. Inizializzare una matrice</h3>
+            <p>Esistono vari modi per riempire la matrice:</p>
+            <ul>
+                <li><strong>Inizializzazione a zeri:</strong> <code>int m[4][5] = {};</code> (Pone tutte le celle a 0 automaticamente).</li>
+                <li><strong>Valori predefiniti:</strong> <code>int m[2][2] = {1, 2, 3, 4};</code>. Verranno caricati ordinatamente (1 e 2 nella prima riga, 3 e 4 nella seconda).</li>
+                <li><strong>Da tastiera:</strong> Inserendo il <code>cin >> m[i][j];</code> dentro al doppio ciclo for.</li>
+            </ul>
+        `
+    },
+    "Vettori": {
+        title: "I Vettori (Array) in C++: Esercizi Pratici",
+        content: `
+            <h3>1. Caricare e visualizzare un vettore</h3>
+            <p>Un array è una sequenza contigua di elementi. L'indice inizia da 0. Ecco come riempirlo con input utente e visualizzarlo.</p>
             <pre><code class="language-cpp">
 #include &lt;iostream&gt;
-#include &lt;fstream&gt;
 using namespace std;
+const int N = 5;
 
 int main() {
-    // Apro un file in modalità scrittura (out)
-    ofstream fileOutput("dati.txt", ios::out); 
-    
-    // Verifico sempre se il file è stato aperto correttamente!
-    if (!fileOutput.is_open()) {
-        cerr << "Errore irreversibile: Impossibile aprire il file!" << endl;
-        return 1;
+    int v[N];
+    // Caricamento
+    for(int i = 0; i < N; i++) {
+        cout << "Inserisci numero: ";
+        cin >> v[i];
     }
-
-    fileOutput << "Questo testo finisce prima nel Buffer, poi su Disco.";
-    fileOutput.close(); // Forza il salvataggio fisico su disco e rilascia la risorsa
+    // Visualizzazione normale
+    for(int i = 0; i < N; i++) cout << v[i] << " ";
+    
+    // Visualizzazione decrescente (dall'ultimo al primo)
+    for(int i = N - 1; i >= 0; i--) cout << v[i] << " ";
     return 0;
 }
             </code></pre>
 
-            <h3>3. Modalità di Apertura (Flags ios)</h3>
-            <p>Le modalità determinano il comportamento del file all'apertura. Si possono combinare con l'operatore bit a bit OR (<code>|</code>).</p>
-            <ul>
-                <li><code>ios::in</code> : Lettura. Se il file non esiste, fallisce.</li>
-                <li><code>ios::out</code> : Scrittura. Se il file esiste, <strong>viene cancellato (troncato)</strong> e riscritto da zero!</li>
-                <li><code>ios::app</code> : Append. Tutto ciò che scrivi viene incollato alla <strong>fine</strong> del file, preservando i dati vecchi.</li>
-                <li><code>ios::trunc</code> : Truncate. Svuota esplicitamente un file già esistente.</li>
-            </ul>
-
-            <h3>4. Lettura carattere per carattere</h3>
-            <p>Per leggere testi complessi o con spazi particolari senza far collassare la formattazione, è utile leggere un byte (char) alla volta con <code>get()</code>:</p>
-            <pre><code class="language-cpp">
-ifstream fileInput("dati.txt");
-char c;
-// get(c) estrae esattamente un char dallo stream, inclusi spazi e ritorni a capo (\\n)
-while (fileInput.get(c)) {
-    cout << c; 
-}
-            </code></pre>
-        `
-    },
-    "Matrici": {
-        title: "Le Matrici in C++ (Array Bidimensionali)",
-        content: `
-            <h3>1. La Struttura di una Matrice</h3>
-            <p>In C++, una matrice non è nient'altro che un <strong>"Array di Array"</strong>. Quando dichiariamo <code>int mat[3][4];</code> stiamo creando un array di 3 elementi, dove ogni elemento è a sua volta un array di 4 interi.</p>
-            <p>Sebbene noi la immaginiamo come una griglia 2D, nella memoria RAM (che è lineare), il C++ la memorizza in modalità <strong>Row-Major Order</strong>: le righe vengono adagiate una dopo l'altra consecutivamente nella memoria.</p>
-            
-            <h3>2. Visualizzazione Dinamica dell'Iterazione</h3>
-            <p>Il modo standard per attraversare una matrice in C++ è l'utilizzo di due cicli <code>for</code> annidati. Il ciclo esterno (di solito variabile <code>i</code>) scorre le <strong>righe</strong>, mentre il ciclo interno (variabile <code>j</code>) scorre le <strong>colonne</strong> all'interno di quella riga.</p>
-            
-            <div id="interactive-matrix-demo" class="demo-container"></div>
-            
-            <p>Premi il bottone qui sopra per vedere come le variabili <code>i</code> e <code>j</code> muovono l'indice di memoria (puntatore) all'interno della griglia.</p>
-
-            <h3>3. Esempio Codice: Somma Massima di una Riga</h3>
-            <p>Per calcolare quale riga possiede la somma degli elementi più alta (tipica domanda di esame):</p>
-            <pre><code class="language-cpp">
-int matrix[4][4] = {
-    {1, 2, 3, 4},
-    {5, 6, 7, 8}, // <-- Riga con somma massima in questo esempio? No, l'ultima!
-    {1, 1, 1, 1},
-    {10, 10, 10, 10} // <-- Questa!
-};
-
-int maxIdx = 0;
-int maxSum = -999999;
-
-for(int i = 0; i < 4; i++) {
-    int currentSum = 0; // Azzera la somma all'inizio di ogni nuova riga!
-    for(int j = 0; j < 4; j++) {
-        currentSum += matrix[i][j];
-    }
-    // Finita la riga, controllo se ha battuto il record
-    if(currentSum > maxSum) {
-        maxSum = currentSum;
-        maxIdx = i; // Memorizzo l'indice della riga vincente!
-    }
-}
-cout << "La riga con la somma massima è la " << maxIdx << " con somma: " << maxSum << endl;
-            </code></pre>
-        `
-    },
-    "Vettori": {
-        title: "I Vettori (Array Monodimensionali) in C++",
-        content: `
-            <h3>1. Cos'è un Vettore (Array)?</h3>
-            <p>In C++, un vettore o array è una <strong>collezione di elementi tutti dello stesso tipo</strong>, memorizzati in un blocco contiguo (di seguito) nella memoria RAM.</p>
-            <p>A differenza di Python dove una lista può contenere sia numeri che stringhe, in C++ un array è <strong>fortemente tipizzato</strong>. Se dichiari un array di interi, può contenere solo interi.</p>
-            
-            <pre><code class="language-cpp">
-// Array di interi
-int numeri[5] = {10, 20, 30, 40, 50};
-
-// Array di float (numeri con la virgola)
-float temperature[3] = {36.5, 37.2, 38.0};
-
-// Array di char (stringa in stile C antico)
-char vocali[5] = {'A', 'E', 'I', 'O', 'U'};
-            </code></pre>
-
-            <h3>2. L'Indice base-0 e la Memoria Contigua</h3>
-            <p>In C++, gli array iniziano <strong>sempre dall'indice 0</strong>. Quindi un array di 5 elementi andrà dall'indice 0 all'indice 4. Se provi ad accedere all'indice 5, leggerai memoria non tua (Buffer Overflow!), causando bug gravissimi.</p>
-            
             <div id="interactive-vector-demo" class="demo-container"></div>
 
-            <h3>3. Iterare su un Array generico</h3>
-            <p>Per leggere o modificare un array, usiamo un ciclo <code>for</code>. Ecco un esempio su un array di interi in cui raddoppiamo i valori:</p>
+            <h3>2. Modificare Condizionalmente</h3>
+            <p>Spesso viene chiesto di modificare "gli elementi pari" o "gli elementi in posizione dispari". Bisogna distinguere il <strong>valore</strong> dall'<strong>indice</strong>!</p>
             <pre><code class="language-cpp">
-int arr[4] = {1, 2, 3, 4};
-for(int i = 0; i < 4; i++) {
-    arr[i] = arr[i] * 2; 
-    cout << "Ora vale: " << arr[i] << endl;
+// Modificare i VALORI pari
+for (int i = 0; i < N; i++) {
+    if (v[i] % 2 == 0) v[i] *= 3; // Moltiplico per 3 il contenuto
 }
-// Output: 2, 4, 6, 8
+
+// Modificare i valori negli INDICI dispari
+for (int i = 0; i < N; i++) {
+    if (i % 2 != 0) v[i] += 100; // Aggiungo 100
+}
             </code></pre>
 
-            <h3>4. Vettori di Stringhe e il problema della dimensione</h3>
-            <p>Un caso particolare sono gli array di tipo <code>std::string</code>. Le stringhe del C++ sono oggetti, ma possiamo metterle in un array normale.</p>
+            <h3>3. Somme e Array Paralleli</h3>
+            <p>Un esercizio comune è gestire più array contemporaneamente. Se hai due array <code>a</code> e <code>b</code>, puoi sommarli in un array <code>c</code> con un singolo ciclo!</p>
             <pre><code class="language-cpp">
-#include &lt;string&gt;
-using namespace std;
+int a[N], b[N], c[N];
+int sommap = 0, sommad = 0;
 
-string arrayParole[3] = {"Pippo", "Pluto", "Paperino"};
+for (int i = 0; i < N; i++) {
+    // Somma di vettori paralleli
+    c[i] = a[i] + b[i];
+    
+    // Somma dei contenuti pari/dispari del vettore a
+    if (i % 2 == 0) sommap += a[i]; // Somma valori in posizioni pari
+    else sommad += a[i]; // Somma valori in pos. dispari
+}
             </code></pre>
-            <p><strong>Attenzione:</strong> In C++ puro, a differenza dei linguaggi moderni (come Java che ha <code>arr.length</code>), l'array nativo <strong>non conosce la sua lunghezza</strong>. Devi sempre passarla separatamente alle funzioni! Le stringhe invece sanno la loro lunghezza interna tramite <code>.length()</code> o <code>.size()</code>.</p>
-            
-            <h3>5. Esercizio Tipico (Esame): Trovare la parola più lunga</h3>
-            <p>Esempio: "Creare una funzione che ricevuto un array di stringhe già riempito, determini in che posizione si trova la parola più lunga."</p>
+
+            <h3>4. Inserimenti particolari</h3>
+            <p>Se voglio inserire al volo un pattern (ad es. i multipli di 3, partendo da 3, 6, 9...)</p>
             <pre><code class="language-cpp">
-int trovaPosizioneParolaPiuLunga(string arr[], int size) {
-    int maxIdx = 0; // Assumo che la prima (indice 0) sia la vincitrice all'inizio
-    
-    // Ciclo partendo dalla seconda parola (i = 1)
-    for(int i = 1; i < size; i++) {
-        // Se la stringa attuale è PIU' LUNGA del record attuale
-        if(arr[i].length() > arr[maxIdx].length()) {
-            maxIdx = i; // Aggiorno il record!
-        }
-    }
-    
-    return maxIdx; // Ritorno l'indice (la POSIZIONE)
+for (int i = 0; i < N; i++) {
+    v[i] = (i + 1) * 3; // All'indice 0 metto 1*3=3. All'indice 1 metto 2*3=6...
+}
+
+// Array al rovescio matematicamente:
+for (int i = 0; i < N; i++) {
+    v[i] = N - 1 - i;
 }
             </code></pre>
         `
