@@ -214,5 +214,75 @@ int main() {
 }
             </code></pre>
         `
+    },
+    "Circuiti RLC": {
+        title: "Circuiti RLC: Resistore, Induttore e Condensatore",
+        content: `
+            <h3>1. I Componenti Fondamentali</h3>
+            <p>I circuiti RLC prendono il nome dai tre componenti passivi fondamentali dell'elettronica lineare:</p>
+            <ul>
+                <li><strong>Resistore (R)</strong>: Si oppone al passaggio della corrente, dissipando energia sotto forma di calore (Effetto Joule). La sua unità di misura è l'Ohm (Ω). La legge di Ohm (V = R * I) governa il suo comportamento.</li>
+                <li><strong>Induttore (L)</strong>: È costituito da una bobina di filo conduttore. Immagazzina energia sotto forma di campo magnetico. Si oppone alle variazioni di corrente. L'unità di misura è l'Henry (H).</li>
+                <li><strong>Condensatore (C)</strong>: È formato da due armature conduttrici separate da un dielettrico. Immagazzina energia sotto forma di campo elettrico. Si oppone alle variazioni di tensione. L'unità di misura è il Farad (F).</li>
+            </ul>
+
+            <h3>2. Comportamento in Corrente Continua (CC) e Alternata (CA)</h3>
+            <p>Mentre la resistenza ha lo stesso valore in CC e CA, induttori e condensatori si comportano diversamente in base alla frequenza del segnale (reattanza):</p>
+            <ul>
+                <li><strong>Condensatore:</strong> In CC si comporta come un circuito aperto (dopo essersi caricato). In CA, la sua opposizione (reattanza capacitiva) diminuisce all'aumentare della frequenza.</li>
+                <li><strong>Induttore:</strong> In CC si comporta come un cortocircuito. In CA, la sua opposizione (reattanza induttiva) aumenta all'aumentare della frequenza.</li>
+            </ul>
+
+            <h3>3. Circuito RLC in Serie e Parallelo</h3>
+            <p>In un circuito RLC, la combinazione delle reattanze e della resistenza si chiama <strong>Impedenza (Z)</strong>, misurata anch'essa in Ohm.</p>
+            <p><strong>Risonanza:</strong> È il fenomeno più importante dei circuiti RLC. Avviene a una specifica frequenza (frequenza di risonanza) in cui la reattanza induttiva e quella capacitiva si annullano a vicenda.
+            In un RLC serie in risonanza, l'impedenza è minima (uguale alla sola R) e la corrente è massima. Viene sfruttato nei filtri (es. sintonizzare una radio).</p>
+        `
+    },
+    "Porte Logiche": {
+        title: "Porte Logiche e Algebra Booleana",
+        content: `
+            <h3>1. L'Algebra di Boole e i Segnali Digitali</h3>
+            <p>L'elettronica digitale si basa sull'Algebra di Boole, un sistema matematico che utilizza solo due valori: <strong>0 (Falso / Low)</strong> e <strong>1 (Vero / High)</strong>.
+            Questi valori logici corrispondono a livelli di tensione nei circuiti fisici.</p>
+
+            <h3>2. Le Porte Logiche Fondamentali</h3>
+            <ul>
+                <li><strong>NOT (Invertitore):</strong> Ha 1 ingresso e 1 uscita. L'uscita è l'opposto dell'ingresso. Se entra 0 esce 1, se entra 1 esce 0.</li>
+                <li><strong>AND (Prodotto Logico):</strong> Ha 2 o più ingressi. L'uscita è 1 SOLO SE TUTTI gli ingressi sono 1. (Es: un sistema si attiva solo se chiave girata AND pulsante premuto).</li>
+                <li><strong>OR (Somma Logica):</strong> Ha 2 o più ingressi. L'uscita è 1 se ALMENO UN ingresso è 1. (Es: allarme suona se si apre porta OR si apre finestra).</li>
+            </ul>
+
+            <h3>3. Porte Logiche Derivate</h3>
+            <ul>
+                <li><strong>NAND (NOT AND):</strong> È un AND seguito da un NOT. L'uscita è 0 solo se tutti gli ingressi sono 1.</li>
+                <li><strong>NOR (NOT OR):</strong> È un OR seguito da un NOT. L'uscita è 1 solo se tutti gli ingressi sono 0.</li>
+                <li><strong>XOR (OR Esclusivo):</strong> L'uscita è 1 se gli ingressi sono diversi tra loro (uno a 0, uno a 1). Se sono uguali (0-0 o 1-1) l'uscita è 0.</li>
+            </ul>
+            <p>Nota: NAND e NOR sono dette porte <em>universali</em> perché combinandole si può creare qualsiasi altra porta logica.</p>
+        `
+    },
+    "Diodi e Ponte di Graetz": {
+        title: "Diodi e Ponte di Graetz (Raddrizzatore)",
+        content: `
+            <h3>1. Il Diodo a Semiconduttore</h3>
+            <p>Il diodo è il componente semiconduttore più semplice. Permette il passaggio di corrente elettrica <strong>in una sola direzione</strong>, bloccandola nella direzione opposta (come una valvola idraulica di non ritorno).</p>
+            <p>È costituito da una giunzione P-N (silicio drogato positivamente e negativamente). I suoi terminali si chiamano <strong>Anodo</strong> (+) e <strong>Catodo</strong> (-).</p>
+
+            <h3>2. Polarizzazione</h3>
+            <ul>
+                <li><strong>Diretta:</strong> Si applica tensione positiva all'anodo e negativa al catodo. Il diodo conduce (dopo aver superato la tensione di soglia, ~0.7V per il silicio).</li>
+                <li><strong>Inversa:</strong> Si inverte la polarità. Il diodo non conduce e blocca il passaggio di corrente.</li>
+            </ul>
+
+            <h3>3. Raddrizzamento della Corrente</h3>
+            <p>La rete elettrica fornisce corrente alternata (CA, un'onda sinusoidale che inverte polarità 50 volte al secondo). I circuiti elettronici hanno bisogno di corrente continua (CC, costante). I diodi servono a "raddrizzare" l'onda.</p>
+            
+            <h3>4. Il Ponte di Graetz</h3>
+            <p>Il ponte di Graetz è un circuito intelligente costituito da <strong>4 diodi</strong> collegati a "rombo".</p>
+            <p>È un raddrizzatore a <strong>doppia semionda</strong>. In CA, durante la semionda positiva, 2 dei 4 diodi conducono. Durante la semionda negativa, conducono gli altri 2 diodi.
+            Il risultato è che la corrente all'uscita fluisce <strong>sempre nella stessa direzione</strong>.</p>
+            <p>Dopo il ponte di Graetz, il segnale è raddrizzato (solo pulsazioni positive) ma non ancora continuo. Viene solitamente collegato un grosso <strong>Condensatore di livellamento</strong> in parallelo per "spianare" le pulsazioni e ottenere una vera CC (Corrente Continua) stabile, pronta per alimentare smartphone o PC.</p>
+        `
     }
 };
