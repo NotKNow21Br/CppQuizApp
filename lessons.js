@@ -216,73 +216,145 @@ int main() {
         `
     },
     "Circuiti RLC": {
-        title: "Circuiti RLC: Resistore, Induttore e Condensatore",
+        title: "Circuiti RLC: Analisi Avanzata e Risonanza",
         content: `
             <h3>1. I Componenti Fondamentali</h3>
             <p>I circuiti RLC prendono il nome dai tre componenti passivi fondamentali dell'elettronica lineare:</p>
             <ul>
-                <li><strong>Resistore (R)</strong>: Si oppone al passaggio della corrente, dissipando energia sotto forma di calore (Effetto Joule). La sua unità di misura è l'Ohm (Ω). La legge di Ohm (V = R * I) governa il suo comportamento.</li>
-                <li><strong>Induttore (L)</strong>: È costituito da una bobina di filo conduttore. Immagazzina energia sotto forma di campo magnetico. Si oppone alle variazioni di corrente. L'unità di misura è l'Henry (H).</li>
-                <li><strong>Condensatore (C)</strong>: È formato da due armature conduttrici separate da un dielettrico. Immagazzina energia sotto forma di campo elettrico. Si oppone alle variazioni di tensione. L'unità di misura è il Farad (F).</li>
+                <li><strong>Resistore (R)</strong>: Si oppone al passaggio della corrente, dissipando energia sotto forma di calore (Effetto Joule). La sua unità di misura è l'Ohm (Ω). La legge di Ohm (V = R * I) governa il suo comportamento. Non introduce sfasamento tra tensione e corrente.</li>
+                <li><strong>Induttore (L)</strong>: È costituito da una bobina di filo conduttore. Immagazzina energia sotto forma di campo magnetico. L'unità di misura è l'Henry (H). In un induttore ideale, la tensione anticipa la corrente di 90°.</li>
+                <li><strong>Condensatore (C)</strong>: Formato da due armature conduttrici separate da un dielettrico. Immagazzina energia sotto forma di campo elettrico. L'unità di misura è il Farad (F). In un condensatore ideale, la corrente anticipa la tensione di 90°.</li>
             </ul>
 
-            <h3>2. Comportamento in Corrente Continua (CC) e Alternata (CA)</h3>
-            <p>Mentre la resistenza ha lo stesso valore in CC e CA, induttori e condensatori si comportano diversamente in base alla frequenza del segnale (reattanza):</p>
+            <h3>2. Reattanza e Impedenza</h3>
+            <p>In Corrente Alternata (CA), induttori e condensatori offrono una resistenza al passaggio della corrente che dipende dalla frequenza (<em>f</em>), detta <strong>Reattanza (X)</strong>:</p>
             <ul>
-                <li><strong>Condensatore:</strong> In CC si comporta come un circuito aperto (dopo essersi caricato). In CA, la sua opposizione (reattanza capacitiva) diminuisce all'aumentare della frequenza.</li>
-                <li><strong>Induttore:</strong> In CC si comporta come un cortocircuito. In CA, la sua opposizione (reattanza induttiva) aumenta all'aumentare della frequenza.</li>
+                <li><strong>Reattanza Induttiva (X<sub>L</sub>):</strong> X<sub>L</sub> = 2πfL. Aumenta all'aumentare della frequenza. In CC (f=0) è zero (cortocircuito).</li>
+                <li><strong>Reattanza Capacitiva (X<sub>C</sub>):</strong> X<sub>C</sub> = 1 / (2πfC). Diminuisce all'aumentare della frequenza. In CC (f=0) è infinita (circuito aperto).</li>
             </ul>
+            <p>La combinazione vettoriale di Resistenza e Reattanza è l'<strong>Impedenza (Z)</strong>, misurata in Ohm. Per un circuito RLC serie, si calcola con il Teorema di Pitagora sui fasori:</p>
+            <p style="text-align:center; font-size:1.2rem; margin:1rem 0; padding:10px; background:rgba(0,255,0,0.1); border-radius:5px;"><strong>Z = &radic;(R² + (X<sub>L</sub> - X<sub>C</sub>)²)</strong></p>
 
-            <h3>3. Circuito RLC in Serie e Parallelo</h3>
-            <p>In un circuito RLC, la combinazione delle reattanze e della resistenza si chiama <strong>Impedenza (Z)</strong>, misurata anch'essa in Ohm.</p>
-            <p><strong>Risonanza:</strong> È il fenomeno più importante dei circuiti RLC. Avviene a una specifica frequenza (frequenza di risonanza) in cui la reattanza induttiva e quella capacitiva si annullano a vicenda.
-            In un RLC serie in risonanza, l'impedenza è minima (uguale alla sola R) e la corrente è massima. Viene sfruttato nei filtri (es. sintonizzare una radio).</p>
+            <h3>3. Circuito in Risonanza</h3>
+            <p>La risonanza è il fenomeno che si verifica quando la Reattanza Induttiva e quella Capacitiva sono esattamente uguali (X<sub>L</sub> = X<sub>C</sub>). In questa condizione, i loro effetti si annullano a vicenda.</p>
+            <p>La frequenza alla quale avviene questo è detta <strong>Frequenza di Risonanza (f<sub>r</sub>)</strong> ed è data dalla formula di Thomson:</p>
+            <p style="text-align:center; font-size:1.2rem; margin:1rem 0; padding:10px; background:rgba(0,255,0,0.1); border-radius:5px;"><strong>f<sub>r</sub> = 1 / (2π&radic;(LC))</strong></p>
+            <p>In un circuito RLC serie in risonanza, l'impedenza è minima (Z = R) e la corrente raggiunge il suo valore massimo. Questa proprietà è ampiamente utilizzata nei sintonizzatori radio per selezionare una specifica frequenza (stazione) rigettando le altre.</p>
         `
     },
     "Porte Logiche": {
-        title: "Porte Logiche e Algebra Booleana",
+        title: "Porte Logiche, Tabelle di Verità e Algebra di Boole",
         content: `
             <h3>1. L'Algebra di Boole e i Segnali Digitali</h3>
-            <p>L'elettronica digitale si basa sull'Algebra di Boole, un sistema matematico che utilizza solo due valori: <strong>0 (Falso / Low)</strong> e <strong>1 (Vero / High)</strong>.
-            Questi valori logici corrispondono a livelli di tensione nei circuiti fisici.</p>
+            <p>L'elettronica digitale si basa sull'Algebra di Boole, un sistema matematico in cui le variabili possono assumere solo due valori: <strong>0 (Low/Falso)</strong> e <strong>1 (High/Vero)</strong>. Questi valori vengono manipolati tramite operatori logici fondamentali.</p>
 
-            <h3>2. Le Porte Logiche Fondamentali</h3>
-            <ul>
-                <li><strong>NOT (Invertitore):</strong> Ha 1 ingresso e 1 uscita. L'uscita è l'opposto dell'ingresso. Se entra 0 esce 1, se entra 1 esce 0.</li>
-                <li><strong>AND (Prodotto Logico):</strong> Ha 2 o più ingressi. L'uscita è 1 SOLO SE TUTTI gli ingressi sono 1. (Es: un sistema si attiva solo se chiave girata AND pulsante premuto).</li>
-                <li><strong>OR (Somma Logica):</strong> Ha 2 o più ingressi. L'uscita è 1 se ALMENO UN ingresso è 1. (Es: allarme suona se si apre porta OR si apre finestra).</li>
-            </ul>
+            <h3>2. Tabelle di Verità: AND, OR, NOT</h3>
+            <p>Le tre porte logiche basilari. Una <em>tabella di verità</em> elenca tutti i possibili stati degli ingressi (A, B) e il corrispondente stato dell'uscita (Y).</p>
+            
+            <div style="display:flex; flex-wrap:wrap; gap:2rem; margin-top:1rem;">
+                <!-- Tabella AND -->
+                <table border="1" style="border-collapse:collapse; text-align:center; min-width:150px;">
+                    <caption style="font-weight:bold; margin-bottom:5px;">Porta AND (A · B)</caption>
+                    <tr style="background:var(--primary); color:black;"><th>A</th><th>B</th><th>Y</th></tr>
+                    <tr><td>0</td><td>0</td><td>0</td></tr>
+                    <tr><td>0</td><td>1</td><td>0</td></tr>
+                    <tr><td>1</td><td>0</td><td>0</td></tr>
+                    <tr><td>1</td><td>1</td><td><strong>1</strong></td></tr>
+                </table>
 
-            <h3>3. Porte Logiche Derivate</h3>
+                <!-- Tabella OR -->
+                <table border="1" style="border-collapse:collapse; text-align:center; min-width:150px;">
+                    <caption style="font-weight:bold; margin-bottom:5px;">Porta OR (A + B)</caption>
+                    <tr style="background:var(--secondary); color:white;"><th>A</th><th>B</th><th>Y</th></tr>
+                    <tr><td>0</td><td>0</td><td>0</td></tr>
+                    <tr><td>0</td><td>1</td><td><strong>1</strong></td></tr>
+                    <tr><td>1</td><td>0</td><td><strong>1</strong></td></tr>
+                    <tr><td>1</td><td>1</td><td><strong>1</strong></td></tr>
+                </table>
+
+                <!-- Tabella NOT -->
+                <table border="1" style="border-collapse:collapse; text-align:center; min-width:150px;">
+                    <caption style="font-weight:bold; margin-bottom:5px;">Porta NOT (A')</caption>
+                    <tr style="background:var(--success); color:black;"><th>A</th><th>Y</th></tr>
+                    <tr><td>0</td><td><strong>1</strong></td></tr>
+                    <tr><td>1</td><td>0</td></tr>
+                </table>
+            </div>
+            <p>L'AND restituisce 1 SOLO SE entrambi gli ingressi sono 1. L'OR restituisce 1 se ALMENO UN ingresso è 1. Il NOT inverte il segnale.</p>
+
+            <h3>3. Porte Logiche Universali e Derivate (NAND, NOR, XOR)</h3>
+            <p>Aggiungendo un NOT in cascata a AND e OR, otteniamo <strong>NAND</strong> e <strong>NOR</strong>. Sono dette porte "universali" perché è possibile ricostruire qualsiasi circuito logico usando ESCLUSIVAMENTE porte NAND o ESCLUSIVAMENTE porte NOR.</p>
+            
+            <div style="display:flex; flex-wrap:wrap; gap:2rem; margin-top:1rem;">
+                <!-- Tabella NAND -->
+                <table border="1" style="border-collapse:collapse; text-align:center; min-width:150px;">
+                    <caption style="font-weight:bold; margin-bottom:5px;">Porta NAND (NOT AND)</caption>
+                    <tr style="background:#555; color:white;"><th>A</th><th>B</th><th>Y</th></tr>
+                    <tr><td>0</td><td>0</td><td>1</td></tr>
+                    <tr><td>0</td><td>1</td><td>1</td></tr>
+                    <tr><td>1</td><td>0</td><td>1</td></tr>
+                    <tr><td>1</td><td>1</td><td><strong>0</strong></td></tr>
+                </table>
+
+                <!-- Tabella NOR -->
+                <table border="1" style="border-collapse:collapse; text-align:center; min-width:150px;">
+                    <caption style="font-weight:bold; margin-bottom:5px;">Porta NOR (NOT OR)</caption>
+                    <tr style="background:#555; color:white;"><th>A</th><th>B</th><th>Y</th></tr>
+                    <tr><td>0</td><td>0</td><td><strong>1</strong></td></tr>
+                    <tr><td>0</td><td>1</td><td>0</td></tr>
+                    <tr><td>1</td><td>0</td><td>0</td></tr>
+                    <tr><td>1</td><td>1</td><td>0</td></tr>
+                </table>
+
+                <!-- Tabella XOR -->
+                <table border="1" style="border-collapse:collapse; text-align:center; min-width:150px;">
+                    <caption style="font-weight:bold; margin-bottom:5px;">Porta XOR (OR Esclusivo)</caption>
+                    <tr style="background:#f39c12; color:black;"><th>A</th><th>B</th><th>Y</th></tr>
+                    <tr><td>0</td><td>0</td><td>0</td></tr>
+                    <tr><td>0</td><td>1</td><td><strong>1</strong></td></tr>
+                    <tr><td>1</td><td>0</td><td><strong>1</strong></td></tr>
+                    <tr><td>1</td><td>1</td><td>0</td></tr>
+                </table>
+            </div>
+            <p>La porta <strong>XOR</strong> restituisce 1 se e solo se gli ingressi sono <em>diversi</em> tra loro. Molto usata nei circuiti sommatori e di parità.</p>
+
+            <h3>4. Teoremi di De Morgan</h3>
+            <p>Fondamentali nell'algebra di Boole per semplificare i circuiti logici:</p>
             <ul>
-                <li><strong>NAND (NOT AND):</strong> È un AND seguito da un NOT. L'uscita è 0 solo se tutti gli ingressi sono 1.</li>
-                <li><strong>NOR (NOT OR):</strong> È un OR seguito da un NOT. L'uscita è 1 solo se tutti gli ingressi sono 0.</li>
-                <li><strong>XOR (OR Esclusivo):</strong> L'uscita è 1 se gli ingressi sono diversi tra loro (uno a 0, uno a 1). Se sono uguali (0-0 o 1-1) l'uscita è 0.</li>
+                <li><strong>1° Teorema:</strong> NOT(A AND B) = (NOT A) OR (NOT B). <em>Una porta NAND equivale a un OR con gli ingressi negati.</em></li>
+                <li><strong>2° Teorema:</strong> NOT(A OR B) = (NOT A) AND (NOT B). <em>Una porta NOR equivale a un AND con gli ingressi negati.</em></li>
             </ul>
-            <p>Nota: NAND e NOR sono dette porte <em>universali</em> perché combinandole si può creare qualsiasi altra porta logica.</p>
         `
     },
     "Diodi e Ponte di Graetz": {
-        title: "Diodi e Ponte di Graetz (Raddrizzatore)",
+        title: "Diodi Semiconduttori e Alimentatori (Ponte di Graetz)",
         content: `
             <h3>1. Il Diodo a Semiconduttore</h3>
-            <p>Il diodo è il componente semiconduttore più semplice. Permette il passaggio di corrente elettrica <strong>in una sola direzione</strong>, bloccandola nella direzione opposta (come una valvola idraulica di non ritorno).</p>
-            <p>È costituito da una giunzione P-N (silicio drogato positivamente e negativamente). I suoi terminali si chiamano <strong>Anodo</strong> (+) e <strong>Catodo</strong> (-).</p>
-
-            <h3>2. Polarizzazione</h3>
+            <p>Il diodo è un componente passivo non lineare costituito da una giunzione P-N (solitamente Silicio). Consente il flusso di corrente <strong>in un'unica direzione</strong> (dall'Anodo al Catodo), bloccandolo nell'altra.</p>
             <ul>
-                <li><strong>Diretta:</strong> Si applica tensione positiva all'anodo e negativa al catodo. Il diodo conduce (dopo aver superato la tensione di soglia, ~0.7V per il silicio).</li>
-                <li><strong>Inversa:</strong> Si inverte la polarità. Il diodo non conduce e blocca il passaggio di corrente.</li>
+                <li><strong>Polarizzazione Diretta:</strong> Anodo positivo rispetto al catodo. Superata la tensione di soglia (circa 0.7V per il silicio), il diodo conduce corrente comportandosi come un interruttore chiuso.</li>
+                <li><strong>Polarizzazione Inversa:</strong> Anodo negativo. Il diodo non conduce (interruttore aperto). Attenzione: se la tensione inversa supera la <em>Tensione di Breakdown</em>, il componente viene distrutto.</li>
             </ul>
 
-            <h3>3. Raddrizzamento della Corrente</h3>
-            <p>La rete elettrica fornisce corrente alternata (CA, un'onda sinusoidale che inverte polarità 50 volte al secondo). I circuiti elettronici hanno bisogno di corrente continua (CC, costante). I diodi servono a "raddrizzare" l'onda.</p>
-            
-            <h3>4. Il Ponte di Graetz</h3>
-            <p>Il ponte di Graetz è un circuito intelligente costituito da <strong>4 diodi</strong> collegati a "rombo".</p>
-            <p>È un raddrizzatore a <strong>doppia semionda</strong>. In CA, durante la semionda positiva, 2 dei 4 diodi conducono. Durante la semionda negativa, conducono gli altri 2 diodi.
-            Il risultato è che la corrente all'uscita fluisce <strong>sempre nella stessa direzione</strong>.</p>
-            <p>Dopo il ponte di Graetz, il segnale è raddrizzato (solo pulsazioni positive) ma non ancora continuo. Viene solitamente collegato un grosso <strong>Condensatore di livellamento</strong> in parallelo per "spianare" le pulsazioni e ottenere una vera CC (Corrente Continua) stabile, pronta per alimentare smartphone o PC.</p>
+            <h3>2. L'Alimentatore Lineare</h3>
+            <p>Per trasformare la corrente alternata di rete (es. 230V CA a 50Hz) in corrente continua (es. 12V CC) servono più stadi:</p>
+            <ol>
+                <li><strong>Trasformatore:</strong> Abbassa la tensione alternata da 230V a un valore sicuro (es. 12V CA).</li>
+                <li><strong>Raddrizzatore (Ponte di Graetz):</strong> Converte la CA in corrente pulsante, obbligando il flusso in una sola direzione.</li>
+                <li><strong>Filtro (Condensatore di livellamento):</strong> "Spiana" le pulsazioni per avvicinarsi a una corrente continua costante.</li>
+                <li><strong>Stabilizzatore (Regolatore / Diodo Zener):</strong> Mantiene la tensione esattamente al valore desiderato (es. 12.0V) indipendentemente dal carico.</li>
+            </ol>
+
+            <h3>3. Il Ponte di Graetz (Raddrizzatore a Doppia Semionda)</h3>
+            <p>A differenza di un singolo diodo (che taglia via metà dell'onda), il ponte di Graetz utilizza <strong>4 diodi collegati a rombo</strong>. Il suo scopo è "ribaltare" la semionda negativa facendola diventare positiva.</p>
+            <ul>
+                <li>Durante la semionda positiva del trasformatore, i diodi D1 e D3 conducono, mentre D2 e D4 sono interdetti (bloccati).</li>
+                <li>Durante la semionda negativa, D2 e D4 conducono, mentre D1 e D3 sono interdetti.</li>
+            </ul>
+            <p>In ogni istante, la corrente attraversa sempre il carico nella <strong>stessa direzione</strong>. Questo produce un segnale costituito solo da semionde positive, raddoppiando l'efficienza rispetto a un raddrizzatore a singola semionda.</p>
+
+            <h3>4. Il Ripple e il Diodo Zener</h3>
+            <p>Anche dopo il raddrizzamento e l'uso di un condensatore, rimangono piccole variazioni di tensione (ondulazioni) chiamate <strong>Ripple</strong>. Per eliminarlo completamente si usa un regolatore integrato o un <strong>Diodo Zener</strong>. Lo Zener è un diodo speciale progettato per lavorare <em>in polarizzazione inversa</em>: mantiene una tensione fissa e costante ai suoi capi, offrendo una "tensione di riferimento" perfetta per l'elettronica sensibile.</p>
         `
     }
 };
