@@ -1,8 +1,0 @@
-Piano di lavoro:
-1. Aggiungere tre nuove lezioni in lessons.js: "Circuiti RLC", "Porte Logiche", "Diodi e Ponte di Graetz".
-   - Circuiti RLC: Spiegazione teorica su R (Resistore), L (Induttore), C (Condensatore) e il loro comportamento (serie, parallelo, risonanza).
-   - Porte Logiche: Spiegazione AND, OR, NOT, NAND, NOR, XOR con tabelle di verità e concetti di base dell'algebra booleana.
-   - Diodi e Ponte di Graetz: Cos'è un diodo (semiconduttore, polarizzazione diretta/inversa) e cos'è un ponte di Graetz (raddrizzatore a doppia semionda, conversione AC/DC).
-2. Aggiungere le domande corrispondenti in questions.js per poter superare i quiz su questi argomenti.
-3. Migliorare leggermente il design o l'organizzazione se necessario (es. l'interfaccia nel file style.css o index.html). 
-4. Assicurarsi che le nuove sezioni si integrino perfettamente nella piattaforma e siano visivamente in linea con il design (app CppQuizApp). Nonostante il nome sia CppQuizApp, la richiesta dell'utente è chiara: vuole queste materie di Elettronica/Sistemi aggiunte.
