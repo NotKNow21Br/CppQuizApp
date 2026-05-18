@@ -1,6 +1,1 @@
-Piano di lavoro AGGIORNATO:
-1. Ampliare la lezione sulle "Porte Logiche" in lessons.js: inserire tabelle di verità (truth tables) HTML esplicite per AND, OR, NOT, NAND, NOR, XOR, e spiegare più a fondo i concetti di algebra booleana (Teoremi di De Morgan, ecc.).
-2. Ampliare "Circuiti RLC" in lessons.js: aggiungere formule (frequenza di risonanza f = 1 / (2π√(LC)), calcolo dell'impedenza Z = √(R² + (X_L - X_C)²), e diagrammi dei fasori o spiegazioni più approfondite).
-3. Ampliare "Diodi e Ponte di Graetz" in lessons.js: parlare del ripple, del diodo Zener per la stabilizzazione, e del trasformatore prima del ponte, per un quadro più ingegneristico e completo sull'alimentatore DC.
-4. Modificare questions.js per aggiungere "tantissime" nuove domande per queste 3 categorie. Aggiungerò circa 10-15 domande per categoria per renderlo molto corposo e utile per la preparazione.
-5. Verificare che l'HTML/CSS supporti tabelle carine. (C'è style.css, vedremo di usare classi HTML semplici come border=1 o style "border-collapse").
+
