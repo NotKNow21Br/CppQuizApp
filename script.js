@@ -184,6 +184,9 @@ function openLesson(moduleName) {
     if(document.getElementById('interactive-matrix-demo')) initMatrixDemo();
     if(document.getElementById('interactive-vector-demo')) initVectorDemo();
     if(document.getElementById('interactive-buffer-demo')) initBufferDemo();
+    if(document.getElementById('interactive-logic-demo')) initLogicDemo();
+    if(document.getElementById('interactive-os-demo')) initOSDemo();
+    if(document.getElementById('interactive-hamming-demo')) initHammingDemo();
 }
 
 function completeLesson() {
@@ -657,6 +660,344 @@ function initBufferDemo() {
     };
 }
 
+// --- NUOVE SIMULAZIONI ---
+function initLogicDemo() {
+    const container = document.getElementById('interactive-logic-demo');
+    container.innerHTML = '<div class="demo-title">Simulatore Porte Logiche</div>';
+    
+    const flex = document.createElement('div');
+    flex.style.display = 'flex';
+    flex.style.gap = '2rem';
+    flex.style.alignItems = 'center';
+    flex.style.background = 'rgba(0,0,0,0.2)';
+    flex.style.padding = '1rem';
+    flex.style.borderRadius = '12px';
+    
+    const inputsBox = document.createElement('div');
+    inputsBox.style.display = 'flex';
+    inputsBox.style.flexDirection = 'column';
+    inputsBox.style.gap = '1rem';
+    
+    const btnA = document.createElement('button');
+    btnA.className = 'btn-secondary';
+    btnA.style.minWidth = '80px';
+    btnA.textContent = 'A = 0';
+    let valA = 0;
+    
+    const btnB = document.createElement('button');
+    btnB.className = 'btn-secondary';
+    btnB.style.minWidth = '80px';
+    btnB.textContent = 'B = 0';
+    let valB = 0;
+    
+    inputsBox.appendChild(btnA);
+    inputsBox.appendChild(btnB);
+    
+    const gatesBox = document.createElement('div');
+    gatesBox.style.display = 'flex';
+    gatesBox.style.flexDirection = 'column';
+    gatesBox.style.gap = '0.5rem';
+    
+    const gateSelect = document.createElement('select');
+    gateSelect.className = 'form-input';
+    gateSelect.style.padding = '0.5rem';
+    gateSelect.style.background = 'var(--bg-dark)';
+    gateSelect.style.color = 'white';
+    gateSelect.style.border = '1px solid var(--primary)';
+    gateSelect.style.borderRadius = '6px';
+    ['AND', 'OR', 'XOR', 'NAND', 'NOR'].forEach(g => {
+        const opt = document.createElement('option');
+        opt.value = g;
+        opt.textContent = 'Porta ' + g;
+        gateSelect.appendChild(opt);
+    });
+    gatesBox.appendChild(gateSelect);
+    
+    const arrow = document.createElement('div');
+    arrow.innerHTML = '➔';
+    arrow.style.fontSize = '2rem';
+    
+    const outputBox = document.createElement('div');
+    outputBox.style.display = 'flex';
+    outputBox.style.flexDirection = 'column';
+    outputBox.style.alignItems = 'center';
+    
+    const outLight = document.createElement('div');
+    outLight.style.width = '50px';
+    outLight.style.height = '50px';
+    outLight.style.borderRadius = '50%';
+    outLight.style.background = '#333';
+    outLight.style.border = '2px solid #555';
+    outLight.style.transition = 'all 0.3s ease';
+    
+    const outLabel = document.createElement('div');
+    outLabel.textContent = 'Y = 0';
+    outLabel.style.marginTop = '0.5rem';
+    outLabel.style.fontWeight = 'bold';
+    
+    outputBox.appendChild(outLight);
+    outputBox.appendChild(outLabel);
+    
+    flex.appendChild(inputsBox);
+    flex.appendChild(gatesBox);
+    flex.appendChild(arrow);
+    flex.appendChild(outputBox);
+    
+    container.appendChild(flex);
+    
+    const updateLogic = () => {
+        const gate = gateSelect.value;
+        let y = 0;
+        if(gate === 'AND') y = valA & valB;
+        if(gate === 'OR') y = valA | valB;
+        if(gate === 'XOR') y = valA ^ valB;
+        if(gate === 'NAND') y = !(valA & valB) ? 1 : 0;
+        if(gate === 'NOR') y = !(valA | valB) ? 1 : 0;
+        
+        outLabel.textContent = 'Y = ' + y;
+        if(y === 1) {
+            outLight.style.background = 'var(--accent)';
+            outLight.style.boxShadow = '0 0 20px var(--accent)';
+            outLight.style.borderColor = '#fff';
+        } else {
+            outLight.style.background = '#333';
+            outLight.style.boxShadow = 'none';
+            outLight.style.borderColor = '#555';
+        }
+    };
+    
+    btnA.onclick = () => {
+        valA = valA === 0 ? 1 : 0;
+        btnA.textContent = 'A = ' + valA;
+        if(valA) { btnA.style.background = 'var(--primary)'; btnA.style.color = '#fff'; }
+        else { btnA.style.background = ''; btnA.style.color = ''; }
+        updateLogic();
+    };
+    
+    btnB.onclick = () => {
+        valB = valB === 0 ? 1 : 0;
+        btnB.textContent = 'B = ' + valB;
+        if(valB) { btnB.style.background = 'var(--primary)'; btnB.style.color = '#fff'; }
+        else { btnB.style.background = ''; btnB.style.color = ''; }
+        updateLogic();
+    };
+    
+    gateSelect.onchange = updateLogic;
+    updateLogic();
+}
+
+function initOSDemo() {
+    const container = document.getElementById('interactive-os-demo');
+    container.innerHTML = '<div class="demo-title">Simulazione Scheduler: Round Robin</div>';
+    
+    const flex = document.createElement('div');
+    flex.style.display = 'flex';
+    flex.style.flexDirection = 'column';
+    flex.style.gap = '1rem';
+    flex.style.width = '100%';
+    
+    const cpuBox = document.createElement('div');
+    cpuBox.style.padding = '1rem';
+    cpuBox.style.background = 'rgba(99, 102, 241, 0.1)';
+    cpuBox.style.border = '2px dashed var(--primary)';
+    cpuBox.style.borderRadius = '12px';
+    cpuBox.style.textAlign = 'center';
+    cpuBox.innerHTML = '<strong>CPU (In Esecuzione)</strong><br><span id="os-cpu-proc" style="font-size:1.2rem; color:var(--accent); min-height:30px; display:inline-block">In attesa...</span>';
+    
+    const queueBox = document.createElement('div');
+    queueBox.style.display = 'flex';
+    queueBox.style.gap = '0.5rem';
+    queueBox.style.justifyContent = 'center';
+    queueBox.style.padding = '1rem';
+    queueBox.style.background = 'rgba(255,255,255,0.05)';
+    queueBox.style.borderRadius = '12px';
+    
+    flex.appendChild(cpuBox);
+    flex.appendChild(queueBox);
+    container.appendChild(flex);
+    
+    const btnPlay = document.createElement('button');
+    btnPlay.className = 'btn-secondary mt-4';
+    btnPlay.textContent = '▶ Avvia Scheduler';
+    container.appendChild(btnPlay);
+    
+    let isPlaying = false;
+    
+    btnPlay.onclick = () => {
+        if(isPlaying) return;
+        isPlaying = true;
+        btnPlay.disabled = true;
+        
+        let procs = [
+            { id: 'P1', timeLeft: 3, color: '#f87171' },
+            { id: 'P2', timeLeft: 2, color: '#60a5fa' },
+            { id: 'P3', timeLeft: 4, color: '#34d399' }
+        ];
+        
+        const renderQueue = () => {
+            queueBox.innerHTML = '<strong>Coda Ready:</strong> ';
+            if(procs.length === 0) queueBox.innerHTML += 'Vuota';
+            procs.forEach(p => {
+                const el = document.createElement('div');
+                el.style.padding = '5px 10px';
+                el.style.background = p.color;
+                el.style.color = '#000';
+                el.style.borderRadius = '4px';
+                el.style.fontWeight = 'bold';
+                el.textContent = p.id + ' (' + p.timeLeft + 'q)';
+                queueBox.appendChild(el);
+            });
+        };
+        
+        renderQueue();
+        
+        if(window.demoInterval) clearInterval(window.demoInterval);
+        
+        window.demoInterval = setInterval(() => {
+            if(procs.length === 0) {
+                document.getElementById('os-cpu-proc').textContent = 'Tutti i processi terminati!';
+                clearInterval(window.demoInterval);
+                setTimeout(() => {
+                    isPlaying = false;
+                    btnPlay.disabled = false;
+                    document.getElementById('os-cpu-proc').textContent = 'In attesa...';
+                    queueBox.innerHTML = '';
+                }, 2000);
+                return;
+            }
+            
+            // Estrai il primo
+            const curr = procs.shift();
+            
+            // Esecuzione 1 quantum
+            document.getElementById('os-cpu-proc').textContent = 'Esecuzione ' + curr.id;
+            document.getElementById('os-cpu-proc').style.color = curr.color;
+            renderQueue();
+            
+            setTimeout(() => {
+                curr.timeLeft--;
+                if(curr.timeLeft > 0) {
+                    // Rimetti in coda (Context Switch)
+                    procs.push(curr);
+                }
+                renderQueue();
+            }, 800);
+            
+        }, 1200);
+    };
+}
+
+function initHammingDemo() {
+    const container = document.getElementById('interactive-hamming-demo');
+    container.innerHTML = '<div class="demo-title">Posizionamento Bit di Parità (Dati a 4 bit)</div>';
+    
+    const grid = document.createElement('div');
+    grid.style.display = 'flex';
+    grid.style.gap = '0.5rem';
+    grid.style.marginTop = '1rem';
+    grid.style.marginBottom = '1rem';
+    
+    // Posizioni 1 a 7
+    const cells = [];
+    for(let i=1; i<=7; i++) {
+        const cellBox = document.createElement('div');
+        cellBox.style.display = 'flex';
+        cellBox.style.flexDirection = 'column';
+        cellBox.style.alignItems = 'center';
+        
+        const label = document.createElement('div');
+        label.style.fontSize = '0.8rem';
+        label.style.color = 'var(--text-muted)';
+        label.textContent = 'P' + i;
+        
+        const cell = document.createElement('div');
+        cell.className = 'grid-cell';
+        cell.style.width = '40px';
+        cell.style.height = '40px';
+        cell.textContent = '?';
+        
+        if(i===1 || i===2 || i===4) {
+            cell.style.border = '2px solid var(--accent)';
+            label.textContent = 'Par ' + i;
+            label.style.color = 'var(--accent)';
+        } else {
+            label.textContent = 'Dat ' + i;
+        }
+        
+        cellBox.appendChild(label);
+        cellBox.appendChild(cell);
+        grid.appendChild(cellBox);
+        cells[i] = cell;
+    }
+    
+    container.appendChild(grid);
+    
+    const inputContainer = document.createElement('div');
+    inputContainer.style.display = 'flex';
+    inputContainer.style.gap = '1rem';
+    inputContainer.style.alignItems = 'center';
+    
+    const dataInput = document.createElement('input');
+    dataInput.type = 'text';
+    dataInput.maxLength = 4;
+    dataInput.value = '1011';
+    dataInput.className = 'form-input';
+    dataInput.style.width = '80px';
+    dataInput.style.padding = '0.5rem';
+    dataInput.style.background = 'var(--bg-dark)';
+    dataInput.style.color = 'white';
+    dataInput.style.border = '1px solid var(--glass-border)';
+    
+    const btnCalc = document.createElement('button');
+    btnCalc.className = 'btn-secondary';
+    btnCalc.textContent = 'Calcola Hamming';
+    
+    inputContainer.appendChild(document.createTextNode('Dati (4 bit): '));
+    inputContainer.appendChild(dataInput);
+    inputContainer.appendChild(btnCalc);
+    container.appendChild(inputContainer);
+    
+    const infoText = document.createElement('div');
+    infoText.style.marginTop = '1rem';
+    infoText.style.fontSize = '0.9rem';
+    infoText.className = 'code-line';
+    infoText.textContent = 'Pronto.';
+    container.appendChild(infoText);
+    
+    btnCalc.onclick = () => {
+        const val = dataInput.value;
+        if(val.length !== 4 || !/^[01]+$/.test(val)) {
+            alert('Inserisci esattamente 4 bit (0 o 1)');
+            return;
+        }
+        
+        const d1 = parseInt(val[0]);
+        const d2 = parseInt(val[1]);
+        const d3 = parseInt(val[2]);
+        const d4 = parseInt(val[3]);
+        
+        cells[3].textContent = d1;
+        cells[5].textContent = d2;
+        cells[6].textContent = d3;
+        cells[7].textContent = d4;
+        
+        // P1 controlla 1, 3, 5, 7 -> P1 = D1 xor D2 xor D4
+        const p1 = d1 ^ d2 ^ d4;
+        // P2 controlla 2, 3, 6, 7 -> P2 = D1 xor D3 xor D4
+        const p2 = d1 ^ d3 ^ d4;
+        // P4 controlla 4, 5, 6, 7 -> P4 = D2 xor D3 xor D4
+        const p4 = d2 ^ d3 ^ d4;
+        
+        cells[1].textContent = p1;
+        cells[1].style.color = 'var(--accent)';
+        cells[2].textContent = p2;
+        cells[2].style.color = 'var(--accent)';
+        cells[4].textContent = p4;
+        cells[4].style.color = 'var(--accent)';
+        
+        infoText.innerHTML = `P1 = ${d1}^${d2}^${d4} = <span>${p1}</span><br>P2 = ${d1}^${d3}^${d4} = <span>${p2}</span><br>P4 = ${d2}^${d3}^${d4} = <span>${p4}</span>`;
+    };
+}
 
 function shuffleArray(array) {
     const arr = [...array];

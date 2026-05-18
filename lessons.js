@@ -280,6 +280,7 @@ int main() {
                     <tr><td>1</td><td>0</td></tr>
                 </table>
             </div>
+            <div id="interactive-logic-demo" class="demo-container"></div>
             <p>L'AND restituisce 1 SOLO SE entrambi gli ingressi sono 1. L'OR restituisce 1 se ALMENO UN ingresso è 1. Il NOT inverte il segnale.</p>
 
             <h3>3. Porte Logiche Universali e Derivate (NAND, NOR, XOR)</h3>
@@ -355,6 +356,113 @@ int main() {
 
             <h3>4. Il Ripple e il Diodo Zener</h3>
             <p>Anche dopo il raddrizzamento e l'uso di un condensatore, rimangono piccole variazioni di tensione (ondulazioni) chiamate <strong>Ripple</strong>. Per eliminarlo completamente si usa un regolatore integrato o un <strong>Diodo Zener</strong>. Lo Zener è un diodo speciale progettato per lavorare <em>in polarizzazione inversa</em>: mantiene una tensione fissa e costante ai suoi capi, offrendo una "tensione di riferimento" perfetta per l'elettronica sensibile.</p>
+        `
+    },
+    "Codici Rilevazione Errore": {
+        title: "Codici di Rilevazione dell'Errore",
+        content: `
+            <h3>1. Perché servono i codici di rilevazione dell'errore?</h3>
+            <p>Immagina di dettare il tuo numero di telefono a un amico in un luogo molto rumoroso. Per sicurezza, potresti ripeterlo due volte o chiedergli di rileggertelo. In informatica avviene la stessa cosa: quando i bit (0 e 1) viaggiano su un cavo (bus) o via Wi-Fi, possono subire alterazioni a causa di interferenze elettromagnetiche (rumore). Per evitare che un'informazione sbagliata venga elaborata, aggiungiamo dei <strong>bit di controllo</strong> che agiscono come una sorta di "firma di sicurezza".</p>
+            
+            <h3>2. Codici Pesati e Non Pesati</h3>
+            <p>I codici usati per trasmettere queste informazioni si dividono in due famiglie principali:</p>
+            <ul>
+                <li><strong>Codici Pesati:</strong> Sono simili al nostro sistema decimale. Ogni posizione del bit ha un "peso" o un valore esatto. Ad esempio, nel binario classico, le posizioni valgono 1, 2, 4, 8. Un esempio famoso è la <strong>Codifica Aiken</strong>.</li>
+                <li><strong>Codici Non Pesati:</strong> Il valore dei bit non dipende dalla loro posizione, ma da regole logiche specifiche create per risolvere problemi tecnici. Esempi famosi sono il <strong>Codice Gray</strong> e il <strong>Codice di Hamming</strong>.</li>
+            </ul>
+
+            <h3>3. Codifica Aiken (Pesato e Auto-complementante)</h3>
+            <p>La codifica Aiken serve per rappresentare le cifre da 0 a 9 usando 4 bit. Ha una proprietà speciale: è <em>simmetrica</em> rispetto al centro. Per i numeri da 5 a 9, sfrutta un trucco logico chiamato <strong>Complemento a 9</strong>.</p>
+            <ul>
+                <li><strong>Per i numeri da 0 a 4:</strong> Si usa il codice binario classico (es. 2 = 0010, 4 = 0100).</li>
+                <li><strong>Per i numeri da 5 a 9:</strong> Si prende il numero, si calcola quanto manca per arrivare a 9, si scrive quel risultato in binario e poi <em>si invertono tutti i bit</em> (cioè si fa il NOT logico).</li>
+            </ul>
+            <div class="code-container" style="background: rgba(0,0,0,0.3); border-left: 4px solid var(--accent); padding: 10px;">
+                <strong>Esempio pratico: Convertiamo il 6 in Aiken</strong><br>
+                1. Quanto manca per arrivare a 9? (9 - 6 = 3)<br>
+                2. Scrivo il 3 in binario a 4 bit: <code>0011</code><br>
+                3. Inverto tutti i bit (0 diventa 1, 1 diventa 0): <code>1100</code>.<br>
+                <em>Risultato: Il 6 in Aiken si scrive 1100!</em>
+            </div>
+
+            <h3>4. Codice Gray (Non Pesato e Antierrore)</h3>
+            <p>I computer a volte si confondono quando troppi bit cambiano tutti insieme in una frazione di secondo. Ad esempio, contando in binario classico da 3 a 4, passiamo da <code>011</code> a <code>100</code>. Sono cambiati ben 3 bit contemporaneamente! Questo può causare "glitch" o letture errate nei sensori hardware.</p>
+            <p>Il <strong>Codice Gray</strong> risolve questo problema con una regola d'oro: <strong>tra un numero e il successivo cambia un solo bit alla volta!</strong></p>
+            <ul style="font-family: var(--font-code);">
+                <li>Decimale 0 &rarr; Gray 000</li>
+                <li>Decimale 1 &rarr; Gray 001 (cambia 1 bit)</li>
+                <li>Decimale 2 &rarr; Gray 011 (cambia 1 bit)</li>
+                <li>Decimale 3 &rarr; Gray 010 (cambia 1 bit)</li>
+            </ul>
+            <p>Si calcola confrontando i bit tramite porte logiche <strong>XOR</strong>.</p>
+
+            <h3>5. Codice di Hamming e Controllo Parità</h3>
+            <p>Il codice di Hamming è un vero colpo di genio: non solo si accorge se un file è corrotto, ma <strong>capisce esattamente quale singolo bit è sbagliato e lo ripara da solo!</strong></p>
+            <p>Funziona inserendo dei <em>bit spia</em> (detti bit di parità) in posizioni strategiche, ovvero sulle potenze di due (posizione 1, 2, 4, 8...). Ogni "spia" sorveglia un gruppo specifico di bit di dati tramite le regole della parità. Se in quel gruppo c'è un errore, la spia suona l'allarme.</p>
+            <p><strong>Il Trucco Magico:</strong> Se durante la ricezione i bit di controllo 2 e 4 segnalano un errore... basta fare la somma! 2 + 4 = 6. Significa che il bit corrotto (passato da 0 a 1 o viceversa) è esattamente quello in <strong>posizione 6</strong>. Il computer andrà alla posizione 6 e invertirà il bit, correggendo il file magicamente.</p>
+            
+            <div id="interactive-hamming-demo" class="demo-container"></div>
+
+            <h3>6. Codice a Barre EAN-13 (La matematica della spesa)</h3>
+            <p>Ogni prodotto al supermercato ha un codice a barre EAN-13 (European Article Number). È composto da 13 cifre. Le prime 12 indicano nazione, produttore e articolo. L'ultima cifra (la 13esima) è un <strong>Check Digit</strong> (Cifra di controllo).</p>
+            <p>Serve a evitare che la cassiera batta uno scontrino errato se il laser o il lettore sbagliano una cifra. Si calcola così:</p>
+            <ol>
+                <li>Si moltiplicano le prime 12 cifre, alternando: la prima per 1, la seconda per 3, la terza per 1, la quarta per 3 e così via.</li>
+                <li>Si sommano tutti i risultati ottenuti.</li>
+                <li>La cifra di controllo è il numero esatto che bisogna aggiungere alla somma totale per farla finire con uno zero (cioè per arrivare al multiplo di 10 successivo).</li>
+            </ol>
+        `
+    },
+    "Il Sistema Operativo": {
+        title: "Il Sistema Operativo e la Gestione dei Processi",
+        content: `
+            <h3>1. Cos'è un Sistema Operativo e il Bootstrap (L'Avvio)</h3>
+            <p>Il Sistema Operativo (Windows, Linux, macOS) è come il "Direttore d'Orchestra" del computer. Senza di esso, processore, RAM e hard disk sarebbero un ammasso di metallo incapace di comunicare. Prima ancora che il SO prenda vita, all'accensione del PC parte il <strong>Ciclo di Bootstrap (o Boot)</strong>, che funziona come il risveglio di una persona:</p>
+            <ol>
+                <li><strong>POST (Power On Self Test):</strong> Il computer si sveglia e "controlla il proprio corpo". Invia piccoli impulsi elettrici a RAM, tastiera e disco per assicurarsi che niente sia rotto o bruciato.</li>
+                <li><strong>IPL (Initial Program Loader):</strong> Se l'hardware sta bene, un piccolo chip sulla scheda madre cerca sull'hard disk l'indirizzo in cui "dorme" il Sistema Operativo e lo sveglia (lancia il Bootloader).</li>
+                <li><strong>Caricamento Kernel:</strong> Il cuore del Sistema Operativo viene caricato nella memoria RAM. Da questo momento, il SO prende il controllo assoluto della macchina e appare la schermata di caricamento.</li>
+            </ol>
+
+            <h3>2. I Supereroi del Sistema Operativo</h3>
+            <p>Il SO non è un singolo programma, ma una squadra di moduli specializzati:</p>
+            <ul>
+                <li><strong>Il Kernel:</strong> Il capo supremo. Gestisce il processore e la memoria. Lavora in un'area blindata chiamata <em>Kernel Mode</em>: nessun programma utente (come Chrome o un videogioco) può toccare la memoria del Kernel, altrimenti il sistema crasherà ("Schermata blu della morte").</li>
+                <li><strong>Il File System:</strong> È l'archivista. Decide come salvare i tuoi documenti sul disco fisso organizzandoli in cartelle e percorsi logici (es. <code>C:\Utenti\Documenti</code>), tenendo traccia dei cluster fisici usati.</li>
+                <li><strong>Lo Scheduler:</strong> Il vigile urbano. Dato che la CPU può fare una cosa alla volta, lo Scheduler decide <em>quale</em> programma far girare in quel millisecondo e <em>chi</em> deve aspettare in coda.</li>
+                <li><strong>Lo Spooler:</strong> Il segretario. Se invii 5 file alla stampante contemporaneamente, la stampante impazzirebbe. Lo Spooler prende i file, li mette ordinatamente in fila in una "coda di stampa" e li invia uno ad uno alla stampante.</li>
+                <li><strong>La Shell:</strong> Il traduttore. È l'interfaccia utente (Grafica o a riga di comando) che traduce i tuoi click del mouse in codici comprensibili dal Kernel.</li>
+            </ul>
+
+            <h3>3. Multitasking, Stati dei Processi e Context-Switch</h3>
+            <p>Oggi puoi ascoltare Spotify mentre scrivi su Word e navighi su Chrome. Questo si chiama <strong>Multitasking</strong>. In realtà, se hai un processore a singolo core, il computer sta passando da Word a Spotify migliaia di volte al secondo, così velocemente che a te sembrano simultanei.</p>
+            <p>Un programma in esecuzione prende il nome di <strong>Processo</strong>. Quando la CPU smette di eseguire Word per passare a Spotify, fa un <strong>Context-switch (Cambio di Contesto)</strong>. Salva la posizione in cui era arrivato Word dentro una speciale "carta d'identità" chiamata <strong>PCB (Process Control Block)</strong>, così quando tornerà a Word saprà da dove riprendere!</p>
+            <p>Gli stati di vita di un processo sono come una stazione della metropolitana:</p>
+            <ul>
+                <li><strong>Nuovo:</strong> Hai appena fatto doppio click sull'icona.</li>
+                <li><strong>Pronto (Ready):</strong> Il processo è caricato in RAM e aspetta il suo turno in coda per prendere la CPU.</li>
+                <li><strong>In Esecuzione (Running):</strong> La CPU sta calcolando il suo codice (questo stato dura pochi millisecondi).</li>
+                <li><strong>In Attesa (Waiting):</strong> Il processo è in pausa perché aspetta una risposta esterna lenta (es. aspetta che tu prema un tasto della tastiera).</li>
+                <li><strong>Finito:</strong> Hai chiuso il programma. La RAM viene svuotata.</li>
+            </ul>
+
+            <h3>4. Algoritmi di Scheduling (Il Vigile Urbano)</h3>
+            <p>Come fa lo Scheduler a decidere a chi dare la CPU? Usa algoritmi specifici. Alcuni sono gentili (Pre-emptive) e altri prepotenti (Non pre-emptive).</p>
+            <ul>
+                <li><strong>FC_FS (First Come First Serve):</strong> È la fila alle Poste. Chi arriva primo viene servito fino alla fine (Non pre-emptive). Se c'è un processo lunghissimo, tutti gli altri restano bloccati finché non ha finito.</li>
+                <li><strong>SJ_F (Shortest Job First):</strong> Esegue prima i programmi che richiedono meno tempo (Non pre-emptive). Causa "starvation": i programmi pesanti potrebbero non partire mai se ne arrivano in continuazione di piccolissimi.</li>
+                <li><strong>Round Robin:</strong> Il più giusto (Pre-emptive). Assegna a tutti uno slot di tempo uguale e strettissimo, chiamato <strong>Quantum</strong> (es. 20 millisecondi). Scaduto il tempo, vieni "scacciato" dalla CPU e rimesso in fondo alla coda. Garantisce che il computer risponda fluidamente.</li>
+            </ul>
+            
+            <div id="interactive-os-demo" class="demo-container"></div>
+            
+            <h3>5. Il problema del Deadlock e i "Filosofi a cena"</h3>
+            <p>A volte due programmi si bloccano a vicenda in modo permanente. Questo si chiama <strong>Deadlock</strong> (Stallo). Il famoso informatico Dijkstra lo spiegò col problema dei <em>Cinque Filosofi a cena</em>.</p>
+            <div class="code-container" style="background: rgba(0,0,0,0.3); border-left: 4px solid var(--error); padding: 10px;">
+                Cinque filosofi sono seduti attorno a un tavolo rotondo. Tra ogni filosofo c'è <strong>una forchetta</strong> (totale 5 forchette). Per mangiare gli spaghetti servono <strong>due forchette</strong>.<br><br>
+                Se per coincidenza tutti e 5 i filosofi afferrano la forchetta alla loro destra contemporaneamente, ognuno avrà 1 forchetta in mano. Nessuno ha le due forchette necessarie per mangiare. Tutti aspetteranno all'infinito che il vicino posi la forchetta per potergliola prendere. Sono in stallo!
+            </div>
+            <p>Nei PC questo accade se Word prende possesso della Scheda Audio e aspetta la Stampante, mentre Spotify prende la Stampante e aspetta la Scheda Audio. Il SO deve prevenire queste situazioni!</p>
         `
     }
 };
